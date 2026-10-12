@@ -1,0 +1,240 @@
+.weather-hero-card {
+  position: relative;
+  background: var(--theme-card-bg);
+  border: 1px solid var(--theme-card-border);
+  border-radius: var(--radius-xl);
+  padding: 2.75rem 2.5rem;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--theme-shadow);
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-glow {
+  position: absolute;
+  top: -30%;
+  right: -10%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.city-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.loc-img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.city-name {
+  font-size: 2.35rem;
+  font-weight: 800;
+  color: var(--theme-text-primary);
+  margin: 0;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.country-badge {
+  background: var(--theme-pill-bg);
+  border: 1px solid var(--theme-card-border);
+  color: var(--theme-text-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.coords-info {
+  color: var(--theme-text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.4rem;
+}
+
+.condition-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 1.1rem;
+  background: var(--theme-pill-bg);
+  border: 1px solid var(--theme-card-border);
+  border-radius: 9999px;
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.condition-badge-img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.condition-text {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--theme-text-primary);
+}
+
+.hero-main {
+  margin: 2rem 0 1rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.temperature-block {
+  display: flex;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+.temp-value {
+  font-size: 5.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--theme-text-primary);
+}
+
+.temp-unit {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--theme-accent);
+  margin-top: 0.5rem;
+  margin-left: 0.25rem;
+}
+
+.weather-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-weather-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2));
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.feels-like {
+  color: var(--theme-text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+.feels-like strong {
+  color: var(--theme-text-primary);
+  font-weight: 700;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1.15rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--theme-card-border);
+}
+
+.metric-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem;
+  background: var(--theme-pill-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--theme-card-border);
+  backdrop-filter: blur(var(--glass-blur));
+  transition: all 0.2s ease;
+}
+
+.metric-item:hover {
+  transform: translateY(-2px);
+  background: var(--theme-card-hover);
+}
+
+.metric-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.metric-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.metric-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: var(--theme-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.metric-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--theme-text-primary);
+}
+
+.metric-value small {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--theme-text-secondary);
+}
+
+@media (max-width: 640px) {
+  .weather-hero-card {
+    padding: 1.75rem 1.5rem;
+  }
+  .temp-value {
+    font-size: 4.2rem;
+  }
+  .hero-weather-img {
+    width: 86px;
+    height: 86px;
+  }
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

@@ -1,0 +1,92 @@
+<div [class]="'app-shell ' + currentTheme()">
+  <app-header></app-header>
+
+  <main class="main-content">
+    <div class="nav-tabs">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'dashboard'"
+        (click)="activeTab.set('dashboard')"
+      >
+        <span>Weather Dashboard</span>
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'ai-chat'"
+        (click)="activeTab.set('ai-chat')"
+      >
+        <span>MCP AI Assistant</span>
+        <span class="pill-badge">AI</span>
+      </button>
+    </div>
+
+    @if (activeTab() === 'dashboard') {
+      <section class="dashboard-section">
+        <app-search-bar
+          [loading]="loading()"
+          (search)="searchCity($event)"
+        ></app-search-bar>
+
+        @if (errorMessage()) {
+          <div class="error-banner">
+            <div class="error-text">
+              <strong>Error:</strong> {{ errorMessage() }}
+            </div>
+            <button
+              type="button"
+              class="dismiss-btn"
+              (click)="errorMessage.set(null)"
+              aria-label="Dismiss error"
+            >
+              &times;
+            </button>
+          </div>
+        }
+
+        @if (loading() && !currentWeather()) {
+          <div class="loading-state">
+            <div class="large-spinner"></div>
+            <p>Fetching weather telemetry...</p>
+          </div>
+        }
+
+        @if (currentWeather()) {
+          <div class="weather-results" [class.content-faded]="loading()">
+            <app-current-weather
+              [data]="currentWeather()"
+            ></app-current-weather>
+          </div>
+        }
+      </section>
+    } @else {
+      <section class="ai-section">
+        <app-ai-chat
+          [messages]="chatMessages()"
+          [thinking]="chatThinking()"
+          (sendMessage)="handleAiChat($event)"
+        ></app-ai-chat>
+      </section>
+    }
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-pills">
+      <span class="pill">
+        <img src="icons/sensors.svg" alt="Sensors" class="footer-img-icon" /> Live Telemetry
+      </span>
+      <span class="pill">
+        <img src="icons/globe.svg" alt="Globe" class="footer-img-icon" /> Global Coverage
+      </span>
+      <span class="pill">
+        <img src="icons/wind.svg" alt="Wind" class="footer-img-icon" /> Wind & Humidity Analytics
+      </span>
+      <span class="pill">
+        <img src="icons/thermostat.svg" alt="Temperature" class="footer-img-icon" /> Precise Temperature (°C)
+      </span>
+    </div>
+    <p class="copyright">Weather MCP • Real-Time Global Weather Observations & Meteorological Telemetry</p>
+  </footer>
+</div>

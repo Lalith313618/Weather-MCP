@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="sunP" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="cloudP" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+  </defs>
+  <circle cx="26" cy="24" r="11" fill="url(#sunP)"/>
+  <path d="M22 48h24a10 10 0 0 0 1.5-19.9A14 14 0 0 0 21 27.2 9 9 0 0 0 22 48z" fill="url(#cloudP)"/>
+</svg>

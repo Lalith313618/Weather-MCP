@@ -1,0 +1,45 @@
+<div class="ai-chat-card">
+  <div class="chat-header">
+    <div class="header-info">
+      <div class="bot-avatar">
+        <img src="icons/bot.svg" alt="AI Bot" class="bot-img-icon" />
+      </div>
+      <div>
+        <h4>Weather AI Assistant</h4>
+        <p>MCP Natural Language Agent</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-messages">
+    @for (msg of messages(); track $index) {
+      <div class="message-bubble" [class.user-bubble]="msg.sender === 'user'" [class.assistant-bubble]="msg.sender === 'assistant'">
+        <div class="bubble-header">
+          <span class="sender-name">{{ msg.sender === 'user' ? 'You' : 'Weather MCP Bot' }}</span>
+          <span class="msg-time">{{ msg.time }}</span>
+        </div>
+        <p class="bubble-text">{{ msg.text }}</p>
+      </div>
+    }
+
+    @if (thinking()) {
+      <div class="message-bubble assistant-bubble thinking-bubble">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      </div>
+    }
+  </div>
+  <form class="chat-input-form" (ngSubmit)="send()">
+    <input
+      type="text"
+      [(ngModel)]="inputText"
+      name="chatQuery"
+      placeholder="Ask anything"
+      [disabled]="thinking()"
+    />
+    <button type="submit" class="send-btn" [disabled]="thinking() || !inputText().trim()">
+      <img src="icons/send.svg" alt="Send" class="send-img-icon" />
+    </button>
+  </form>
+</div>

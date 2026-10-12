@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --glass-blur: 20px;
+
+  /* Default fixed calm modern dark-teal glassmorphic palette (Image 2) */
+  --theme-bg-gradient: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%);
+  --theme-card-bg: rgba(255, 255, 255, 0.10);
+  --theme-card-border: rgba(255, 255, 255, 0.16);
+  --theme-card-hover: rgba(255, 255, 255, 0.18);
+  --theme-accent: #F6D365;
+  --theme-text-primary: #F2F6FA;
+  --theme-text-secondary: #B0C4DE;
+  --theme-text-muted: #829AB1;
+  --theme-input-bg: rgba(255, 255, 255, 0.12);
+  --theme-pill-bg: rgba(255, 255, 255, 0.08);
+  --theme-btn-bg: linear-gradient(135deg, #F6D365 0%, #FDA085 100%);
+  --theme-btn-text: #1C2833;
+  --theme-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+}
+
+/* Clear / Sunny Palette */
+.theme-sunny {
+  --theme-bg-gradient: linear-gradient(135deg, #FFD97D 0%, #FF9A76 100%);
+  --theme-card-bg: rgba(255, 255, 255, 0.25);
+  --theme-card-border: rgba(255, 255, 255, 0.45);
+  --theme-card-hover: rgba(255, 255, 255, 0.35);
+  --theme-accent: #FF6B4A;
+  --theme-text-primary: #3B2A20;
+  --theme-text-secondary: #5D4037;
+  --theme-text-muted: #8D6E63;
+  --theme-input-bg: rgba(255, 255, 255, 0.35);
+  --theme-pill-bg: rgba(255, 255, 255, 0.28);
+  --theme-btn-bg: linear-gradient(135deg, #FF6B4A 0%, #E8502A 100%);
+  --theme-btn-text: #ffffff;
+  --theme-shadow: 0 16px 36px rgba(232, 80, 42, 0.18);
+}
+
+/* Clear Night Palette */
+.theme-night {
+  --theme-bg-gradient: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%);
+  --theme-card-bg: rgba(255, 255, 255, 0.10);
+  --theme-card-border: rgba(255, 255, 255, 0.16);
+  --theme-card-hover: rgba(255, 255, 255, 0.18);
+  --theme-accent: #F6D365;
+  --theme-text-primary: #F2F6FA;
+  --theme-text-secondary: #B0C4DE;
+  --theme-text-muted: #829AB1;
+  --theme-input-bg: rgba(255, 255, 255, 0.12);
+  --theme-pill-bg: rgba(255, 255, 255, 0.08);
+  --theme-btn-bg: linear-gradient(135deg, #F6D365 0%, #FDA085 100%);
+  --theme-btn-text: #1C2833;
+  --theme-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+}
+
+/* Cloudy Palette */
+.theme-cloudy {
+  --theme-bg-gradient: linear-gradient(135deg, #bdc3c7 0%, #7F8FA6 100%);
+  --theme-card-bg: rgba(255, 255, 255, 0.30);
+  --theme-card-border: rgba(255, 255, 255, 0.45);
+  --theme-card-hover: rgba(255, 255, 255, 0.40);
+  --theme-accent: #4A6FA5;
+  --theme-text-primary: #2D3748;
+  --theme-text-secondary: #4A5568;
+  --theme-text-muted: #718096;
+  --theme-input-bg: rgba(255, 255, 255, 0.38);
+  --theme-pill-bg: rgba(255, 255, 255, 0.28);
+  --theme-btn-bg: linear-gradient(135deg, #4A6FA5 0%, #385682 100%);
+  --theme-btn-text: #ffffff;
+  --theme-shadow: 0 16px 36px rgba(45, 55, 72, 0.18);
+}
+
+.theme-rainy {
+  --theme-bg-gradient: linear-gradient(135deg, #4B79A1 0%, #283E51 100%);
+  --theme-card-bg: rgba(255, 255, 255, 0.15);
+  --theme-card-border: rgba(255, 255, 255, 0.22);
+  --theme-card-hover: rgba(255, 255, 255, 0.24);
+  --theme-accent: #6EC6FF;
+  --theme-text-primary: #EAF2F8;
+  --theme-text-secondary: #C8D6E5;
+  --theme-text-muted: #95A5A6;
+  --theme-input-bg: rgba(255, 255, 255, 0.16);
+  --theme-pill-bg: rgba(255, 255, 255, 0.10);
+  --theme-btn-bg: linear-gradient(135deg, #6EC6FF 0%, #2196F3 100%);
+  --theme-btn-text: #0D2137;
+  --theme-shadow: 0 16px 36px rgba(13, 33, 55, 0.35);
+}
+
+.theme-thunderstorm {
+  --theme-bg-gradient: linear-gradient(135deg, #232526 0%, #414345 100%);
+  --theme-card-bg: rgba(255, 255, 255, 0.12);
+  --theme-card-border: rgba(255, 255, 255, 0.18);
+  --theme-card-hover: rgba(255, 255, 255, 0.20);
+  --theme-accent: #F9D423;
+  --theme-text-primary: #F8F9FA;
+  --theme-text-secondary: #D1D5DB;
+  --theme-text-muted: #9CA3AF;
+  --theme-input-bg: rgba(255, 255, 255, 0.14);
+  --theme-pill-bg: rgba(255, 255, 255, 0.08);
+  --theme-btn-bg: linear-gradient(135deg, #F9D423 0%, #FF4E50 100%);
+  --theme-btn-text: #1C2833;
+  --theme-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input {
+  font-family: inherit;
+}

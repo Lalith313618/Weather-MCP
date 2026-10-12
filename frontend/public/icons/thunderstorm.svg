@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="stormCloud" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <path d="M18 36h28a10 10 0 0 0 1.5-19.9A14 14 0 0 0 20 16a9 9 0 0 0-2 20z" fill="url(#stormCloud)"/>
+  <polygon points="32,38 24,48 30,48 26,58 38,46 32,46" fill="#facc15" stroke="#eab308" stroke-width="1"/>
+</svg>

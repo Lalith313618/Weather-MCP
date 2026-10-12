@@ -1,0 +1,80 @@
+@if (data(); as weather) {
+  <div class="weather-hero-card">
+    <div class="card-glow"></div>
+    
+    <div class="hero-top">
+      <div class="location-info">
+        <div class="city-row">
+          <img src="icons/location.svg" alt="Location" class="img-icon loc-img" />
+          <h2 class="city-name">{{ weather.city }}</h2>
+          <span class="country-badge">{{ weather.country }}</span>
+        </div>
+        <p class="coords-info">
+          Lat: {{ weather.latitude.toFixed(2) }}° | Lon: {{ weather.longitude.toFixed(2) }}°
+        </p>
+      </div>
+
+      <div class="condition-badge">
+        <img [src]="getWeatherImage(weather.weatherCode)" [alt]="weather.weatherCondition" class="condition-badge-img" />
+        <span class="condition-text">{{ weather.weatherCondition }}</span>
+      </div>
+    </div>
+
+    <div class="hero-main">
+      <div class="temperature-block">
+        <span class="temp-value">{{ weather.temperature }}</span>
+        <span class="temp-unit">°C</span>
+      </div>
+
+      <div class="weather-visual">
+        <img [src]="getWeatherImage(weather.weatherCode)" [alt]="weather.weatherCondition" class="hero-weather-img" />
+      </div>
+    </div>
+
+    <p class="feels-like">
+      Feels like <strong>{{ weather.apparentTemperature }}°C</strong> • {{ weather.weatherCondition }}
+    </p>
+
+    <div class="metrics-grid">
+      <div class="metric-item">
+        <div class="metric-icon-box wind">
+          <img src="icons/wind.svg" alt="Wind" class="metric-img" />
+        </div>
+        <div class="metric-content">
+          <span class="metric-label">Wind Speed</span>
+          <span class="metric-value">{{ weather.windSpeed }} <small>km/h</small></span>
+        </div>
+      </div>
+
+      <div class="metric-item">
+        <div class="metric-icon-box humidity">
+          <img src="icons/humidity.svg" alt="Humidity" class="metric-img" />
+        </div>
+        <div class="metric-content">
+          <span class="metric-label">Humidity</span>
+          <span class="metric-value">{{ weather.humidity }} <small>%</small></span>
+        </div>
+      </div>
+
+      <div class="metric-item">
+        <div class="metric-icon-box condition">
+          <img src="icons/code.svg" alt="WMO Code" class="metric-img" />
+        </div>
+        <div class="metric-content">
+          <span class="metric-label">WMO Code</span>
+          <span class="metric-value">#{{ weather.weatherCode }}</span>
+        </div>
+      </div>
+
+      <div class="metric-item">
+        <div class="metric-icon-box update">
+          <img src="icons/clock.svg" alt="Observation" class="metric-img" />
+        </div>
+        <div class="metric-content">
+          <span class="metric-label">Observation</span>
+          <span class="metric-value">{{ formatTime(weather.time) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

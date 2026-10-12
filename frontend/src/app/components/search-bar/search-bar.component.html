@@ -1,0 +1,53 @@
+<div class="search-container">
+  <form class="search-form" (ngSubmit)="onSubmit()">
+    <div class="input-wrapper">
+      <img src="icons/search.svg" alt="Search" class="search-img-icon" />
+      <input
+        type="text"
+        [(ngModel)]="cityName"
+        name="city"
+        placeholder="Search any city (e.g. Chennai, London, Tokyo)..."
+        [disabled]="loading()"
+        autocomplete="off"
+        id="city-search-input"
+      />
+      @if (cityName()) {
+        <button
+          type="button"
+          class="clear-btn"
+          (click)="cityName.set('')"
+          aria-label="Clear search"
+        >
+          <img src="icons/clear.svg" alt="Clear" class="clear-img-icon" />
+        </button>
+      }
+    </div>
+    <button
+      type="submit"
+      class="submit-btn"
+      [disabled]="loading() || !cityName().trim()"
+      id="search-submit-btn"
+    >
+      @if (loading()) {
+        <span class="spinner"></span>
+        <span>Searching...</span>
+      } @else {
+        <span>Get Weather</span>
+      }
+    </button>
+  </form>
+
+  <div class="quick-cities">
+    <span class="quick-label">Popular:</span>
+    @for (quick of popularCities; track quick) {
+      <button
+        type="button"
+        class="city-chip"
+        (click)="selectCity(quick)"
+        [disabled]="loading()"
+      >
+        {{ quick }}
+      </button>
+    }
+  </div>
+</div>

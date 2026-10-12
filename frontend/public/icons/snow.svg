@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="snowCloud" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+  </defs>
+  <path d="M18 36h28a10 10 0 0 0 1.5-19.9A14 14 0 0 0 20 16a9 9 0 0 0-2 20z" fill="url(#snowCloud)"/>
+  <circle cx="24" cy="46" r="2.5" fill="#e0f2fe"/>
+  <circle cx="34" cy="52" r="2.5" fill="#e0f2fe"/>
+  <circle cx="42" cy="45" r="2.5" fill="#e0f2fe"/>
+</svg>
