@@ -82,16 +82,38 @@ export class WeatherApiClient {
 
   private static readonly CITY_ALIASES: Record<string, string> = {
     bangalore: "Bengaluru",
+    banglore: "Bengaluru",
+    bengaluru: "Bengaluru",
     bombay: "Mumbai",
+    mumbai: "Mumbai",
+    mumbay: "Mumbai",
     calcutta: "Kolkata",
+    kolkata: "Kolkata",
+    kolkatta: "Kolkata",
     madras: "Chennai",
+    chennai: "Chennai",
+    chenai: "Chennai",
+    chenna: "Chennai",
+    delhi: "Delhi",
+    delh: "Delhi",
+    dilli: "Delhi",
     trivandrum: "Thiruvananthapuram",
+    thiruvananthapuram: "Thiruvananthapuram",
     cochin: "Kochi",
+    kochi: "Kochi",
     baroda: "Vadodara",
+    vadodara: "Vadodara",
     banaras: "Varanasi",
     benares: "Varanasi",
+    varanasi: "Varanasi",
     poona: "Pune",
-    pondicherry: "Puducherry"
+    pune: "Pune",
+    pondicherry: "Puducherry",
+    puducherry: "Puducherry",
+    hyderabad: "Hyderabad",
+    hydrabad: "Hyderabad",
+    ramanathapuram: "Ramanathapuram",
+    ramnad: "Ramanathapuram"
   };
 
   private static async fetchDirectWeather(city: string) {
@@ -129,7 +151,7 @@ export class WeatherApiClient {
     }
     const sorted = [...geoData.results].sort((a: any, b: any) => (b.population || 0) - (a.population || 0));
     const loc = sorted[0];
-    const fRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max&timezone=auto`);
+    const fRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max&past_days=2&forecast_days=10&timezone=auto`);
     const fData = await fRes.json();
 
     const daily = fData.daily.time.map((date: string, i: number) => ({

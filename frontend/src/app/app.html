@@ -7,7 +7,7 @@
         type="button"
         class="tab-btn"
         [class.active]="activeTab() === 'dashboard'"
-        (click)="activeTab.set('dashboard')"
+        (click)="switchTab('dashboard')"
       >
         <span>Weather Dashboard</span>
       </button>
@@ -16,9 +16,9 @@
         type="button"
         class="tab-btn"
         [class.active]="activeTab() === 'ai-chat'"
-        (click)="activeTab.set('ai-chat')"
+        (click)="switchTab('ai-chat')"
       >
-        <span>MCP AI Assistant</span>
+        <span>Assistant</span>
         <span class="pill-badge">AI</span>
       </button>
     </div>
@@ -53,6 +53,16 @@
           </div>
         }
 
+        @if (!loading() && !currentWeather() && !errorMessage()) {
+          <div class="empty-dashboard-state">
+            <div class="empty-icon-wrapper">
+              <img src="icons/partly-cloudy.svg" alt="Search Weather" class="empty-icon" />
+            </div>
+            <h3>Discover Real-Time Weather</h3>
+            <p>Type any city name above or select a popular city to view live temperature, forecasts, and atmosphere telemetry.</p>
+          </div>
+        }
+
         @if (currentWeather()) {
           <div class="weather-results" [class.content-faded]="loading()">
             <app-current-weather
@@ -66,7 +76,9 @@
         <app-ai-chat
           [messages]="chatMessages()"
           [thinking]="chatThinking()"
+          [clearing]="chatClearing()"
           (sendMessage)="handleAiChat($event)"
+          (clearChat)="handleClearChat()"
         ></app-ai-chat>
       </section>
     }

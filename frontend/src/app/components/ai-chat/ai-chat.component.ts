@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, output, signal, ElementRef, viewChild, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 export interface ChatMessage {
@@ -17,9 +17,26 @@ export interface ChatMessage {
 export class AiChatComponent {
   messages = input<ChatMessage[]>([]);
   thinking = input<boolean>(false);
+  clearing = input<boolean>(false);
   sendMessage = output<string>();
+  clearChat = output<void>();
 
   inputText = signal('');
+  messagesContainer = viewChild<ElementRef<HTMLDivElement>>('messagesContainer');
+
+  constructor() {
+    effect(() => {
+      // Re-run effect whenever messages or thinking state changes
+      this.messages();
+      this.thinking();
+      setTimeout(() => {
+        const el = this.messagesContainer()?.nativeElement;
+        if (el) {
+          el.scrollTop = el.scrollHeight;
+        }
+      }, 50);
+    });
+  }
 
   send(): void {
     const text = this.inputText().trim();
@@ -31,5 +48,9 @@ export class AiChatComponent {
 
   ask(query: string): void {
     this.sendMessage.emit(query);
+  }
+
+  onClear(): void {
+    this.clearChat.emit();
   }
 }

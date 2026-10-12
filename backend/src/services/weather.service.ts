@@ -58,16 +58,38 @@ export class WeatherService {
 
   private static readonly CITY_ALIASES: Record<string, string> = {
     bangalore: "Bengaluru",
+    banglore: "Bengaluru",
+    bengaluru: "Bengaluru",
     bombay: "Mumbai",
+    mumbai: "Mumbai",
+    mumbay: "Mumbai",
     calcutta: "Kolkata",
+    kolkata: "Kolkata",
+    kolkatta: "Kolkata",
     madras: "Chennai",
+    chennai: "Chennai",
+    chenai: "Chennai",
+    chenna: "Chennai",
+    delhi: "Delhi",
+    delh: "Delhi",
+    dilli: "Delhi",
     trivandrum: "Thiruvananthapuram",
+    thiruvananthapuram: "Thiruvananthapuram",
     cochin: "Kochi",
+    kochi: "Kochi",
     baroda: "Vadodara",
+    vadodara: "Vadodara",
     banaras: "Varanasi",
     benares: "Varanasi",
+    varanasi: "Varanasi",
     poona: "Pune",
-    pondicherry: "Puducherry"
+    pune: "Pune",
+    pondicherry: "Puducherry",
+    puducherry: "Puducherry",
+    hyderabad: "Hyderabad",
+    hydrabad: "Hyderabad",
+    ramanathapuram: "Ramanathapuram",
+    ramnad: "Ramanathapuram"
   };
 
   public static async geocodeCity(city: string): Promise<GeocodingResult> {
@@ -177,7 +199,7 @@ export class WeatherService {
 
   public static async getDailyForecast(cityName: string): Promise<ForecastResponse> {
     const location = await this.geocodeCity(cityName);
-    const url = `${this.WEATHER_BASE_URL}/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max&timezone=auto`;
+    const url = `${this.WEATHER_BASE_URL}/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max&past_days=2&forecast_days=10&timezone=auto`;
 
     const response = await fetch(url);
     if (!response.ok) {

@@ -114,6 +114,56 @@
   animation: spin 0.8s linear infinite;
 }
 
+.empty-dashboard-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3.5rem 2rem;
+  background: var(--theme-card-bg);
+  border: 1px dashed var(--theme-card-border);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  margin-top: 0.5rem;
+  animation: fadeIn 0.4s ease;
+}
+
+.empty-icon-wrapper {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--theme-pill-bg);
+  border: 1px solid var(--theme-card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--theme-shadow);
+}
+
+.empty-icon {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.empty-dashboard-state h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--theme-text-primary);
+}
+
+.empty-dashboard-state p {
+  margin: 0;
+  max-width: 440px;
+  font-size: 0.92rem;
+  color: var(--theme-text-muted);
+  line-height: 1.5;
+}
+
 .weather-results {
   transition: opacity 0.2s ease;
 }

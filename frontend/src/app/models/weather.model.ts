@@ -63,3 +63,17 @@ export interface HistoryResponse {
   count: number;
   history: WeatherHistoryItem[];
 }
+
+export interface ChatMessageItem {
+  id?: string;
+  sender: 'user' | 'assistant';
+  text: string;
+  time: string;
+  createdAt?: string;
+}
+
+export interface ChatHistoryResponse {
+  success: boolean;
+  count: number;
+  messages: ChatMessageItem[];
+}

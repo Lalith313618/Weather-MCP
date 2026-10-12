@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { connectDatabase } from "./config/db.js";
 import weatherRoutes from "./routes/weather.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -20,7 +21,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", weatherRoutes);
-console.log("Weather routes active");
+app.use("/api", chatRoutes);
+console.log("Weather and Chat routes active");
 
 app.use(notFoundHandler);
 app.use(errorHandler);

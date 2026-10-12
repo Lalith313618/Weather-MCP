@@ -56,6 +56,50 @@
   color: var(--theme-text-muted);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clear-chat-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--theme-text-muted);
+  background: var(--theme-pill-bg);
+  border: 1px solid var(--theme-card-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition: all 0.25s ease;
+}
+
+.clear-chat-btn svg {
+  stroke: var(--theme-text-muted);
+  transition: stroke 0.2s ease;
+}
+
+.clear-chat-btn:hover:not(:disabled) {
+  color: #ff5c77;
+  border-color: rgba(255, 92, 119, 0.45);
+  background: rgba(255, 92, 119, 0.12);
+  transform: translateY(-1px);
+}
+
+.clear-chat-btn:hover:not(:disabled) svg {
+  stroke: #ff5c77;
+}
+
+.clear-chat-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .mcp-tag {
   font-size: 0.75rem;
   font-weight: 700;

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { WeatherResponse, ForecastResponse, HistoryResponse } from '../models/weather.model';
+import { WeatherResponse, ForecastResponse, HistoryResponse, ChatHistoryResponse, ChatMessageItem } from '../models/weather.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,4 +24,17 @@ export class WeatherService {
     const params = new HttpParams().set('limit', limit.toString());
     return this.http.get<HistoryResponse>(`${this.baseUrl}/weather/history`, { params });
   }
+
+  getChatMessages(): Observable<ChatHistoryResponse> {
+    return this.http.get<ChatHistoryResponse>(`${this.baseUrl}/chat/messages`);
+  }
+
+  saveChatMessage(message: { sender: 'user' | 'assistant'; text: string; time: string }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/chat/messages`, message);
+  }
+
+  clearChatMessages(): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/chat/messages`);
+  }
 }
+
