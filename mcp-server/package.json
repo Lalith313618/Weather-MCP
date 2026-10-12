@@ -1,0 +1,25 @@
+{
+  "name": "weather-mcp-server",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) Weather Server",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "weather-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}
