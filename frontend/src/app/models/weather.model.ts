@@ -28,6 +28,14 @@ export interface DailyForecastItem {
   maxWindSpeed: number;
 }
 
+export interface HourlyForecastItem {
+  time: string;
+  temperature: number;
+  weatherCode: number;
+  weatherCondition: string;
+  windSpeed: number;
+}
+
 export interface ForecastResponse {
   success: boolean;
   city: string;
@@ -43,6 +51,7 @@ export interface ForecastResponse {
     humidity: number;
   };
   daily: DailyForecastItem[];
+  hourly?: HourlyForecastItem[];
 }
 
 export interface WeatherHistoryItem {

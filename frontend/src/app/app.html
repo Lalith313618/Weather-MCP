@@ -78,6 +78,7 @@
           [thinking]="chatThinking()"
           [clearing]="chatClearing()"
           (sendMessage)="handleAiChat($event)"
+          (editMessage)="handleEditAiChat($event)"
           (clearChat)="handleClearChat()"
         ></app-ai-chat>
       </section>

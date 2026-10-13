@@ -148,19 +148,137 @@
 .bubble-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 1rem;
   font-size: 0.725rem;
   margin-bottom: 0.3rem;
-  opacity: 0.85;
+  opacity: 0.9;
+}
+
+.sender-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .sender-name {
   font-weight: 700;
 }
 
+.edited-badge {
+  font-size: 0.65rem;
+  font-style: italic;
+  opacity: 0.75;
+}
+
+.bubble-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.edit-msg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.edit-msg-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.32);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.edit-msg-btn svg {
+  stroke: currentColor;
+}
+
 .bubble-text {
   margin: 0;
   white-space: pre-wrap;
+}
+
+.edit-msg-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.4rem;
+}
+
+.edit-msg-input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-family: inherit;
+  line-height: 1.45;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.edit-msg-input:focus {
+  outline: none;
+  border-color: var(--theme-accent);
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.edit-cancel-btn {
+  padding: 0.28rem 0.7rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-cancel-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.edit-save-btn {
+  padding: 0.28rem 0.8rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #111;
+  background: var(--theme-accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.edit-save-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.edit-save-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .sample-queries {

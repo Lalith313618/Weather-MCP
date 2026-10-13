@@ -5,6 +5,7 @@ export interface ChatMessage {
   sender: 'user' | 'assistant';
   text: string;
   time: string;
+  edited?: boolean;
 }
 
 @Component({
@@ -19,9 +20,12 @@ export class AiChatComponent {
   thinking = input<boolean>(false);
   clearing = input<boolean>(false);
   sendMessage = output<string>();
+  editMessage = output<{ index: number; newText: string }>();
   clearChat = output<void>();
 
   inputText = signal('');
+  editingIndex = signal<number | null>(null);
+  editingText = signal<string>('');
   messagesContainer = viewChild<ElementRef<HTMLDivElement>>('messagesContainer');
 
   constructor() {
@@ -52,5 +56,23 @@ export class AiChatComponent {
 
   onClear(): void {
     this.clearChat.emit();
+  }
+
+  startEdit(index: number, text: string): void {
+    this.editingIndex.set(index);
+    this.editingText.set(text);
+  }
+
+  cancelEdit(): void {
+    this.editingIndex.set(null);
+    this.editingText.set('');
+  }
+
+  saveEdit(index: number): void {
+    const newText = this.editingText().trim();
+    if (newText && newText !== this.messages()[index]?.text) {
+      this.editMessage.emit({ index, newText });
+    }
+    this.cancelEdit();
   }
 }

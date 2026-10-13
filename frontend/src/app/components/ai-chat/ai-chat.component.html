@@ -34,10 +34,57 @@
     @for (msg of messages(); track $index) {
       <div class="message-bubble" [class.user-bubble]="msg.sender === 'user'" [class.assistant-bubble]="msg.sender === 'assistant'">
         <div class="bubble-header">
-          <span class="sender-name">{{ msg.sender === 'user' ? 'You' : 'Weather MCP Bot' }}</span>
-          <span class="msg-time">{{ msg.time }}</span>
+          <div class="sender-info">
+            <span class="sender-name">{{ msg.sender === 'user' ? 'You' : 'Weather MCP ' }}</span>
+            @if (msg.edited) {
+              <span class="edited-badge">(edited)</span>
+            }
+          </div>
+          <div class="bubble-meta">
+            <span class="msg-time">{{ msg.time }}</span>
+            @if (msg.sender === 'user' && editingIndex() !== $index) {
+              <button
+                type="button"
+                class="edit-msg-btn"
+                (click)="startEdit($index, msg.text)"
+                [disabled]="thinking() || clearing()"
+                title="Edit this question"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                <span>Edit</span>
+              </button>
+            }
+          </div>
         </div>
-        <p class="bubble-text">{{ msg.text }}</p>
+
+        @if (editingIndex() === $index) {
+          <div class="edit-msg-box">
+            <textarea
+              class="edit-msg-input"
+              [(ngModel)]="editingText"
+              rows="2"
+              (keydown.enter)="$event.preventDefault(); saveEdit($index)"
+              (keydown.escape)="cancelEdit()"
+              placeholder="Edit your question..."
+            ></textarea>
+            <div class="edit-actions">
+              <button type="button" class="edit-cancel-btn" (click)="cancelEdit()">Cancel</button>
+              <button
+                type="button"
+                class="edit-save-btn"
+                (click)="saveEdit($index)"
+                [disabled]="!editingText().trim()"
+              >
+                Save & Submit
+              </button>
+            </div>
+          </div>
+        } @else {
+          <p class="bubble-text">{{ msg.text }}</p>
+        }
       </div>
     }
 
