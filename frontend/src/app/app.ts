@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WeatherService } from './services/weather.service';
-import { AssistantService } from './services/assistant.service';
 import { CurrentWeather } from './models/weather.model';
 import { HeaderComponent } from './components/header/header.component';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
@@ -23,7 +22,6 @@ import { AiChatComponent, ChatMessage } from './components/ai-chat/ai-chat.compo
 })
 export class App implements OnInit {
   private readonly weatherService = inject(WeatherService);
-  private readonly assistantService = inject(AssistantService);
 
   readonly currentWeather = signal<CurrentWeather | null>(null);
   readonly loading = signal<boolean>(false);
@@ -105,7 +103,6 @@ export class App implements OnInit {
           time,
           edited: true
         };
-        // Remove subsequent assistant response so a fresh answer is generated for the edited question
         if (index + 1 < updated.length && updated[index + 1].sender === 'assistant') {
           updated.splice(index + 1, 1);
         }
@@ -146,12 +143,21 @@ export class App implements OnInit {
   private processAiResponse(rawQuery: string): void {
     this.chatThinking.set(true);
 
-    this.assistantService.respond(rawQuery, this.currentWeather()?.city).subscribe({
-      next: (botReply) => {
-        this.addBotResponse(botReply);
+    const historyForGemini = this.chatMessages()
+      .filter((m) => m && m.text && !m.text.includes('Hello! I am your Weather MCP Assistant'))
+      .map((m) => ({ sender: m.sender, text: m.text }));
+
+    this.weatherService.sendAiChat(rawQuery, historyForGemini).subscribe({
+      next: (res) => {
+        if (res && res.success && res.reply) {
+          this.addBotResponse(res.reply);
+        } else {
+          this.addBotResponse(res?.error || "I could not generate an AI response. Please make sure GEMINI_API_KEY is configured in backend/.env.");
+        }
       },
-      error: () => {
-        this.addBotResponse("I couldn't process that request right now. Please try again.");
+      error: (err) => {
+        const errorMsg = err?.error?.error || "Could not connect to Gemini AI. Please check that the backend is running and GEMINI_API_KEY is set in backend/.env.";
+        this.addBotResponse(`⚠️ ${errorMsg}`);
       }
     });
   }

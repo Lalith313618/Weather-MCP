@@ -1,8 +1,38 @@
 import type { Request, Response, NextFunction } from "express";
 import { ChatMessage } from "../models/chatMessage.model.js";
 import { WeatherSearch } from "../models/weatherSearch.model.js";
+import { GeminiService } from "../services/gemini.service.js";
+
+const geminiService = new GeminiService();
 
 export class ChatController {
+  public static async handleChat(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { message, history } = req.body;
+
+      if (!message || typeof message !== "string" || !message.trim()) {
+        res.status(400).json({
+          success: false,
+          error: "Message query is required."
+        });
+        return;
+      }
+
+      const reply = await geminiService.chat(message.trim(), Array.isArray(history) ? history : []);
+
+      res.json({
+        success: true,
+        reply
+      });
+    } catch (error: any) {
+      console.error("Gemini Chat Error:", error);
+      res.status(500).json({
+        success: false,
+        error: error?.message || "Failed to generate AI response with Gemini."
+      });
+    }
+  }
+
   public static async getMessages(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const messages = await ChatMessage.find()
@@ -71,10 +101,8 @@ export class ChatController {
 
   public static async clearMessages(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      // Clear all chat records from the database
-      const chatDeleteResult = await ChatMessage.deleteMany({});
       
-      // Also clear search history logs so all related data is purged
+      const chatDeleteResult = await ChatMessage.deleteMany({});
       const searchDeleteResult = await WeatherSearch.deleteMany({});
 
       res.json({

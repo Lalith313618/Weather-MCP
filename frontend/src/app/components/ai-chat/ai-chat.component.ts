@@ -75,4 +75,23 @@ export class AiChatComponent {
     }
     this.cancelEdit();
   }
+
+  formatMessage(text: string): string {
+    if (!text) return '';
+    return text
+      // Remove markdown heading hashes: ### Header -> Header
+      .replace(/^#{1,6}\s*(.*?)$/gm, '$1')
+      // Remove double asterisks: **text** -> text
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      // Remove single asterisks: *text* -> text
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/__([^_]+)__/g, '$1')
+      .replace(/_([^_]+)_/g, '$1')
+      // Replace markdown bullet points (* or -) with clean bullet dot (•)
+      .replace(/^\s*[\*\-]\s+/gm, '• ')
+      // Clean any lingering asterisks
+      .replace(/\*\*/g, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
 }

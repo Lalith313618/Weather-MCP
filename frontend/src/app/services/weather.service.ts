@@ -36,5 +36,13 @@ export class WeatherService {
   clearChatMessages(): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/chat/messages`);
   }
+
+  sendAiChat(message: string, history: Array<{ sender: 'user' | 'assistant'; text: string }> = []): Observable<{ success: boolean; reply: string; error?: string }> {
+    return this.http.post<{ success: boolean; reply: string; error?: string }>(`${this.baseUrl}/chat`, {
+      message,
+      history
+    });
+  }
 }
+
 
