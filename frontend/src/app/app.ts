@@ -1,11 +1,14 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, NavigationEnd } from '@angular/router';
 import { WeatherService } from './services/weather.service';
 import { CurrentWeather } from './models/weather.model';
 import { HeaderComponent } from './components/header/header.component';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { CurrentWeatherComponent } from './components/current-weather/current-weather.component';
-import { AiChatComponent, ChatMessage } from './components/ai-chat/ai-chat.component';
+import { AiChatComponent, ChatMessage, ChatSession } from './components/ai-chat/ai-chat.component';
+import { Login } from './features/auth/login/login';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -15,21 +18,36 @@ import { AiChatComponent, ChatMessage } from './components/ai-chat/ai-chat.compo
     HeaderComponent,
     SearchBarComponent,
     CurrentWeatherComponent,
-    AiChatComponent
+    AiChatComponent,
+    Login
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App implements OnInit {
   private readonly weatherService = inject(WeatherService);
+  private readonly router = inject(Router, { optional: true });
+  readonly authService = inject(AuthService);
 
+  readonly isLoginPage = signal<boolean>(false);
   readonly currentWeather = signal<CurrentWeather | null>(null);
+
   readonly loading = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
   readonly currentTheme = signal<string>('theme-night');
 
   readonly activeTab = signal<'dashboard' | 'ai-chat'>(
-    (typeof localStorage !== 'undefined' && (localStorage.getItem('weather_mcp_tab') as 'dashboard' | 'ai-chat')) || 'dashboard'
+    (() => {
+      if (typeof localStorage !== 'undefined') {
+        try {
+          const saved = localStorage.getItem('weather_mcp_tab');
+          if (saved === 'ai-chat' || saved === 'dashboard') {
+            return saved;
+          }
+        } catch (e) {}
+      }
+      return 'dashboard';
+    })()
   );
 
   readonly chatThinking = signal<boolean>(false);
@@ -41,10 +59,50 @@ export class App implements OnInit {
     time: 'Online'
   };
 
-  readonly chatMessages = signal<ChatMessage[]>([this.defaultWelcomeMessage]);
+  readonly chatSessions = signal<ChatSession[]>([]);
+  readonly activeSessionId = signal<string>('');
+
+  readonly chatMessages = computed<ChatMessage[]>(() => {
+    const current = this.chatSessions().find((s) => s.id === this.activeSessionId());
+    return current ? current.messages : [this.defaultWelcomeMessage];
+  });
 
   ngOnInit(): void {
-    this.loadPersistedChat();
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const savedTab = localStorage.getItem('weather_mcp_tab');
+        if (savedTab === 'ai-chat' || savedTab === 'dashboard') {
+          this.activeTab.set(savedTab);
+        }
+      } catch (e) {}
+    }
+
+    if (this.authService.isLoggedIn() && this.authService.currentUserEmail()) {
+      this.loadPersistedChat(this.authService.currentUserEmail()!);
+    }
+
+    this.authService.authStateChanged.subscribe(({ isLoggedIn, email }) => {
+      this.activeTab.set('dashboard');
+      try {
+        localStorage.setItem('weather_mcp_tab', 'dashboard');
+      } catch (e) {}
+
+      if (isLoggedIn && email) {
+        this.loadPersistedChat(email);
+      } else {
+        this.chatSessions.set([]);
+        this.activeSessionId.set('');
+      }
+    });
+
+    if (this.router) {
+      this.isLoginPage.set(this.router.url.includes('/login'));
+      this.router.events.subscribe((event) => {
+        if (event instanceof NavigationEnd) {
+          this.isLoginPage.set(event.urlAfterRedirects.includes('/login'));
+        }
+      });
+    }
   }
 
   switchTab(tab: 'dashboard' | 'ai-chat'): void {
@@ -52,6 +110,12 @@ export class App implements OnInit {
     try {
       localStorage.setItem('weather_mcp_tab', tab);
     } catch (e) {}
+
+    if (tab === 'ai-chat' && this.authService.isLoggedIn() && this.authService.currentUserEmail()) {
+      if (this.chatSessions().length === 0) {
+        this.loadPersistedChat(this.authService.currentUserEmail()!);
+      }
+    }
   }
 
   searchCity(city: string): void {
@@ -73,158 +137,321 @@ export class App implements OnInit {
     });
   }
 
+  handleNewChat(): void {
+    const email = (this.authService.currentUserEmail() || 'guest').toLowerCase().trim();
+    const newId = 'session_' + Date.now();
+    const newSession: ChatSession = {
+      id: newId,
+      title: 'New Conversation',
+      userEmail: email,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      messages: [this.defaultWelcomeMessage]
+    };
+
+    this.chatSessions.update((sessions) => [newSession, ...sessions]);
+    this.activeSessionId.set(newId);
+    this.persistLocalSessions(this.chatSessions());
+    try {
+      localStorage.setItem(`weather_mcp_active_session_${email}`, newId);
+    } catch (e) {}
+  }
+
+  handleSelectSession(sessionId: string): void {
+    this.activeSessionId.set(sessionId);
+    const email = (this.authService.currentUserEmail() || 'guest').toLowerCase().trim();
+    try {
+      localStorage.setItem(`weather_mcp_active_session_${email}`, sessionId);
+    } catch (e) {}
+  }
+
+  handleDeleteSession(sessionId: string): void {
+    const email = this.authService.currentUserEmail() || undefined;
+    this.weatherService.clearChatMessages(email, sessionId).subscribe({
+      error: (e) => console.warn('Could not delete session on backend:', e)
+    });
+
+    this.chatSessions.update((sessions) => sessions.filter((s) => s.id !== sessionId));
+    const remaining = this.chatSessions();
+
+    if (this.activeSessionId() === sessionId) {
+      if (remaining.length > 0) {
+        this.activeSessionId.set(remaining[0].id);
+      } else {
+        this.handleNewChat();
+        return;
+      }
+    }
+
+    this.persistLocalSessions(this.chatSessions());
+  }
+
   handleAiChat(query: string): void {
+    let currentId = this.activeSessionId();
+    if (!currentId || !this.chatSessions().some((s) => s.id === currentId)) {
+      this.handleNewChat();
+      currentId = this.activeSessionId();
+    }
+
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const userMsg: ChatMessage = { sender: 'user', text: query, time };
 
-    this.chatMessages.update((msgs) => {
-      const updated = [...msgs, userMsg];
-      this.persistLocalChat(updated);
-      return updated;
-    });
+    this.chatSessions.update((sessions) =>
+      sessions.map((s) => {
+        if (s.id === currentId) {
+          const isInitialTitle = s.title === 'New Conversation' || s.title === 'New Chat';
+          const newTitle = isInitialTitle
+            ? (query.length > 28 ? query.slice(0, 28) + '...' : query)
+            : s.title;
+          return {
+            ...s,
+            title: newTitle,
+            updatedAt: time,
+            messages: [...s.messages, userMsg]
+          };
+        }
+        return s;
+      })
+    );
+    this.persistLocalSessions(this.chatSessions());
 
-    this.weatherService.saveChatMessage(userMsg).subscribe({
+    const userEmail = this.authService.currentUserEmail() || undefined;
+    this.weatherService.saveChatMessage(userMsg, userEmail, currentId).subscribe({
       error: (e) => console.warn('Could not save user message to database:', e)
     });
 
-    this.processAiResponse(query);
+    this.processAiResponse(query, currentId);
   }
 
   handleEditAiChat(event: { index: number; newText: string }): void {
+    const currentId = this.activeSessionId();
     const { index, newText } = event;
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    this.chatMessages.update((msgs) => {
-      const updated = [...msgs];
-      if (index >= 0 && index < updated.length) {
-        updated[index] = {
-          sender: 'user',
-          text: newText,
-          time,
-          edited: true
-        };
-        if (index + 1 < updated.length && updated[index + 1].sender === 'assistant') {
-          updated.splice(index + 1, 1);
+    this.chatSessions.update((sessions) =>
+      sessions.map((s) => {
+        if (s.id === currentId) {
+          const updatedMessages = [...s.messages];
+          if (index >= 0 && index < updatedMessages.length) {
+            updatedMessages[index] = {
+              sender: 'user',
+              text: newText,
+              time,
+              edited: true
+            };
+            if (index + 1 < updatedMessages.length && updatedMessages[index + 1].sender === 'assistant') {
+              updatedMessages.splice(index + 1, 1);
+            }
+          }
+          return {
+            ...s,
+            updatedAt: time,
+            messages: updatedMessages
+          };
         }
-      }
-      this.persistLocalChat(updated);
-      return updated;
-    });
+        return s;
+      })
+    );
+    this.persistLocalSessions(this.chatSessions());
 
-    this.weatherService.saveChatMessage({ sender: 'user', text: newText, time }).subscribe({
+    const userEmail = this.authService.currentUserEmail() || undefined;
+    this.weatherService.saveChatMessage({ sender: 'user', text: newText, time }, userEmail, currentId).subscribe({
       error: (e) => console.warn('Could not save edited user message:', e)
     });
 
-    this.processAiResponse(newText);
+    this.processAiResponse(newText, currentId);
   }
 
   handleClearChat(): void {
     this.chatClearing.set(true);
+    const currentId = this.activeSessionId();
+    const userEmail = this.authService.currentUserEmail() || undefined;
 
-    this.weatherService.clearChatMessages().subscribe({
+    this.weatherService.clearChatMessages(userEmail, currentId).subscribe({
       next: () => {
-        this.resetChat();
+        this.resetActiveSessionMessages();
       },
       error: (err) => {
         console.error('Failed to clear database chat messages', err);
-        this.resetChat();
+        this.resetActiveSessionMessages();
       }
     });
   }
 
-  private resetChat(): void {
-    this.chatMessages.set([this.defaultWelcomeMessage]);
-    try {
-      localStorage.removeItem('weather_mcp_chat');
-    } catch (e) {}
+  private resetActiveSessionMessages(): void {
+    const currentId = this.activeSessionId();
+    this.chatSessions.update((sessions) =>
+      sessions.map((s) => (s.id === currentId ? { ...s, messages: [this.defaultWelcomeMessage] } : s))
+    );
+    this.persistLocalSessions(this.chatSessions());
     this.chatClearing.set(false);
   }
 
-  private processAiResponse(rawQuery: string): void {
+  private processAiResponse(rawQuery: string, sessionId: string): void {
     this.chatThinking.set(true);
 
-    const historyForGemini = this.chatMessages()
+    const activeSession = this.chatSessions().find((s) => s.id === sessionId);
+    const messages = activeSession ? activeSession.messages : [];
+
+    const historyForGemini = messages
       .filter((m) => m && m.text && !m.text.includes('Hello! I am your Weather MCP Assistant'))
       .map((m) => ({ sender: m.sender, text: m.text }));
 
     this.weatherService.sendAiChat(rawQuery, historyForGemini).subscribe({
       next: (res) => {
-        if (res && res.success && res.reply) {
-          this.addBotResponse(res.reply);
+        if (res.success && res.reply) {
+          this.addBotResponse(res.reply, sessionId);
         } else {
-          this.addBotResponse(res?.error || "I could not generate an AI response. Please make sure GEMINI_API_KEY is configured in backend/.env.");
+          this.addBotResponse(res.error || 'Unable to retrieve weather intelligence. Please try again.', sessionId);
         }
       },
       error: (err) => {
-        const errorMsg = err?.error?.error || "Could not connect to Gemini AI. Please check that the backend is running and GEMINI_API_KEY is set in backend/.env.";
-        this.addBotResponse(`⚠️ ${errorMsg}`);
+        const errorMsg = err?.error?.error || 'Could not connect to Gemini AI. Please check that the backend is running and GEMINI_API_KEY is set in backend/.env.';
+        this.addBotResponse(`⚠️ ${errorMsg}`, sessionId);
       }
     });
   }
 
-  private addBotResponse(text: string): void {
+  private addBotResponse(text: string, sessionId: string): void {
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     this.chatThinking.set(false);
     const botMsg: ChatMessage = { sender: 'assistant', text, time };
 
-    this.chatMessages.update((msgs) => {
-      const updated = [...msgs, botMsg];
-      this.persistLocalChat(updated);
-      return updated;
-    });
+    this.chatSessions.update((sessions) =>
+      sessions.map((s) => {
+        if (s.id === sessionId) {
+          return {
+            ...s,
+            updatedAt: time,
+            messages: [...s.messages, botMsg]
+          };
+        }
+        return s;
+      })
+    );
+    this.persistLocalSessions(this.chatSessions());
 
-    this.weatherService.saveChatMessage(botMsg).subscribe({
+    const userEmail = this.authService.currentUserEmail() || undefined;
+    this.weatherService.saveChatMessage(botMsg, userEmail, sessionId).subscribe({
       error: (e) => console.warn('Could not save bot message to database:', e)
     });
   }
 
-  private loadPersistedChat(): void {
+  private loadPersistedChat(userEmail?: string): void {
+    const email = (userEmail || this.authService.currentUserEmail() || '').trim().toLowerCase();
+    if (!email) {
+      this.chatSessions.set([]);
+      this.activeSessionId.set('');
+      return;
+    }
+
+    const storageKey = `weather_mcp_sessions_${email}`;
+
+    let localSessions: ChatSession[] = [];
     try {
-      const cached = localStorage.getItem('weather_mcp_chat');
+      const cached = localStorage.getItem(storageKey);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const formatted = parsed[0]?.sender === 'assistant' && parsed[0]?.text.includes('Hello! I am your Weather MCP Assistant')
-            ? parsed
-            : [this.defaultWelcomeMessage, ...parsed];
-          this.chatMessages.set(formatted);
+          localSessions = parsed;
         }
       }
     } catch (e) {
-      console.warn('Failed to parse cached chat', e);
+      console.warn('Failed to parse cached sessions:', e);
     }
 
-    this.weatherService.getChatMessages().subscribe({
+    let savedActiveId: string | null = null;
+    try {
+      savedActiveId = localStorage.getItem(`weather_mcp_active_session_${email}`);
+    } catch (e) {}
+
+    if (localSessions.length > 0) {
+      this.chatSessions.set(localSessions);
+      if (savedActiveId && localSessions.some((s) => s.id === savedActiveId)) {
+        this.activeSessionId.set(savedActiveId);
+      } else if (!localSessions.some((s) => s.id === this.activeSessionId())) {
+        this.activeSessionId.set(localSessions[0].id);
+      }
+    } else {
+      const firstId = 'session_' + Date.now();
+      const firstSession: ChatSession = {
+        id: firstId,
+        title: 'New Conversation',
+        userEmail: email,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        messages: [this.defaultWelcomeMessage]
+      };
+      this.chatSessions.set([firstSession]);
+      this.activeSessionId.set(firstId);
+      this.persistLocalSessions([firstSession]);
+    }
+
+    this.weatherService.getChatMessages(email).subscribe({
       next: (res) => {
         if (res.success && res.messages && res.messages.length > 0) {
-          const loaded: ChatMessage[] = res.messages.map((m) => ({
-            sender: m.sender,
-            text: m.text,
-            time: m.time
-          }));
+          const sessionMap = new Map<string, ChatMessage[]>();
+          for (const m of res.messages) {
+            const sId = m.sessionId || 'default';
+            if (!sessionMap.has(sId)) {
+              sessionMap.set(sId, []);
+            }
+            sessionMap.get(sId)!.push({
+              sender: m.sender,
+              text: m.text,
+              time: m.time
+            });
+          }
 
-          const fullList = loaded[0]?.sender === 'assistant' && loaded[0]?.text.includes('Hello! I am your Weather MCP Assistant')
-            ? loaded
-            : [this.defaultWelcomeMessage, ...loaded];
+          const currentSessions = [...this.chatSessions()];
+          const merged: ChatSession[] = [];
 
-          this.chatMessages.set(fullList);
-          this.persistLocalChat(fullList);
+          for (const s of currentSessions) {
+            if (sessionMap.has(s.id)) {
+              const msgs = sessionMap.get(s.id)!;
+              const formatted = msgs[0]?.sender === 'assistant' && msgs[0]?.text.includes('Hello! I am your Weather MCP Assistant')
+                ? msgs
+                : [this.defaultWelcomeMessage, ...msgs];
+              merged.push({ ...s, messages: formatted });
+              sessionMap.delete(s.id);
+            } else {
+              merged.push(s);
+            }
+          }
 
-          const lastMsg = fullList[fullList.length - 1];
-          if (lastMsg && lastMsg.sender === 'user') {
-            this.processAiResponse(lastMsg.text);
+          sessionMap.forEach((msgs, sId) => {
+            const firstUserMsg = msgs.find((m) => m.sender === 'user');
+            const title = firstUserMsg ? (firstUserMsg.text.length > 28 ? firstUserMsg.text.slice(0, 28) + '...' : firstUserMsg.text) : 'Conversation';
+            const formatted = msgs[0]?.sender === 'assistant' && msgs[0]?.text.includes('Hello! I am your Weather MCP Assistant')
+              ? msgs
+              : [this.defaultWelcomeMessage, ...msgs];
+
+            merged.push({
+              id: sId,
+              title,
+              userEmail: email,
+              createdAt: new Date().toISOString(),
+              updatedAt: msgs[msgs.length - 1]?.time || 'Recent',
+              messages: formatted
+            });
+          });
+
+          this.chatSessions.set(merged);
+          this.persistLocalSessions(merged);
+          if (!merged.some((s) => s.id === this.activeSessionId()) && merged.length > 0) {
+            this.activeSessionId.set(merged[0].id);
           }
         }
       },
-      error: (err) => {
-        console.warn('Could not load chat messages from database:', err);
-      }
+      error: (err) => console.warn('Could not sync chat messages from database:', err)
     });
   }
 
-  private persistLocalChat(msgs: ChatMessage[]): void {
+  private persistLocalSessions(sessions: ChatSession[]): void {
+    const email = (this.authService.currentUserEmail() || '').trim().toLowerCase();
+    if (!email) return;
     try {
-      localStorage.setItem('weather_mcp_chat', JSON.stringify(msgs));
+      localStorage.setItem(`weather_mcp_sessions_${email}`, JSON.stringify(sessions));
     } catch (e) {
       console.warn('LocalStorage save failed', e);
     }

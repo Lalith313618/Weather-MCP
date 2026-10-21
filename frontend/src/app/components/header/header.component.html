@@ -1,10 +1,55 @@
 <header class="app-header">
-  <div class="brand">
-    <div class="logo-icon">
-      <img src="icons/logo.svg" alt="Weather Logo" class="brand-logo-img" />
+  <div class="header-left">
+    <a class="brand" routerLink="/">
+      <div class="logo-icon">
+        <img src="icons/logo.svg" alt="Weather Logo" class="brand-logo-img" />
+      </div>
+      <div class="brand-text">
+        <h1>Weather <span class="gradient-text">MCP</span></h1>
+      </div>
+    </a>
+  </div>
+
+  @if (authService.isLoggedIn()) {
+    <div class="header-center">
+      <nav class="nav-tabs" aria-label="Main Navigation">
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeTab() === 'dashboard'"
+          (click)="switchTab('dashboard')"
+        >
+          <span>Weather Dashboard</span>
+        </button>
+
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeTab() === 'ai-chat'"
+          (click)="switchTab('ai-chat')"
+        >
+          <span>Assistant</span>
+          <span class="pill-badge">AI</span>
+        </button>
+      </nav>
     </div>
-    <div class="brand-text">
-      <h1>Weather <span class="gradient-text">MCP</span></h1>
-    </div>
+  }
+
+  <div class="header-right nav-links">
+    @if (authService.isLoggedIn()) {
+      <div class="user-greeting">
+        <span class="user-badge">{{ authService.currentUser() }}</span>
+      </div>
+      <button type="button" class="logout-btn" (click)="handleLogout()">
+        <span>Logout</span>
+      </button>
+    } @else {
+      <a class="nav-login-btn" routerLink="/" [queryParams]="{ view: 'login' }">
+        <span>Login</span>
+      </a>
+      <a class="nav-register-btn" routerLink="/" [queryParams]="{ view: 'register' }">
+        <span>Register</span>
+      </a>
+    }
   </div>
 </header>

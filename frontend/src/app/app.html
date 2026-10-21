@@ -1,87 +1,83 @@
-<div [class]="'app-shell ' + currentTheme()">
-  <app-header></app-header>
+<div [class]="'app-shell ' + currentTheme()" [class.auth-shell]="!authService.isLoggedIn()">
+  <app-header
+    [activeTab]="activeTab()"
+    (tabChange)="switchTab($event)"
+  ></app-header>
 
-  <main class="main-content">
-    <div class="nav-tabs">
-      <button
-        type="button"
-        class="tab-btn"
-        [class.active]="activeTab() === 'dashboard'"
-        (click)="switchTab('dashboard')"
-      >
-        <span>Weather Dashboard</span>
-      </button>
-
-      <button
-        type="button"
-        class="tab-btn"
-        [class.active]="activeTab() === 'ai-chat'"
-        (click)="switchTab('ai-chat')"
-      >
-        <span>Assistant</span>
-        <span class="pill-badge">AI</span>
-      </button>
-    </div>
-
-    @if (activeTab() === 'dashboard') {
-      <section class="dashboard-section">
-        <app-search-bar
-          [loading]="loading()"
-          (search)="searchCity($event)"
-        ></app-search-bar>
-
-        @if (errorMessage()) {
-          <div class="error-banner">
-            <div class="error-text">
-              <strong>Error:</strong> {{ errorMessage() }}
-            </div>
-            <button
-              type="button"
-              class="dismiss-btn"
-              (click)="errorMessage.set(null)"
-              aria-label="Dismiss error"
-            >
-              &times;
-            </button>
-          </div>
-        }
-
-        @if (loading() && !currentWeather()) {
-          <div class="loading-state">
-            <div class="large-spinner"></div>
-            <p>Fetching weather telemetry...</p>
-          </div>
-        }
-
-        @if (!loading() && !currentWeather() && !errorMessage()) {
-          <div class="empty-dashboard-state">
-            <div class="empty-icon-wrapper">
-              <img src="icons/partly-cloudy.svg" alt="Search Weather" class="empty-icon" />
-            </div>
-            <h3>Discover Real-Time Weather</h3>
-            <p>Type any city name above or select a popular city to view live temperature, forecasts, and atmosphere telemetry.</p>
-          </div>
-        }
-
-        @if (currentWeather()) {
-          <div class="weather-results" [class.content-faded]="loading()">
-            <app-current-weather
-              [data]="currentWeather()"
-            ></app-current-weather>
-          </div>
-        }
-      </section>
+  <main
+    class="main-content"
+    [class.wide-layout]="activeTab() === 'ai-chat'"
+    [class.auth-layout]="!authService.isLoggedIn()"
+  >
+    @if (!authService.isLoggedIn()) {
+      <app-login></app-login>
     } @else {
-      <section class="ai-section">
-        <app-ai-chat
-          [messages]="chatMessages()"
-          [thinking]="chatThinking()"
-          [clearing]="chatClearing()"
-          (sendMessage)="handleAiChat($event)"
-          (editMessage)="handleEditAiChat($event)"
-          (clearChat)="handleClearChat()"
-        ></app-ai-chat>
-      </section>
+
+      @if (activeTab() === 'dashboard') {
+        <section class="dashboard-section">
+          <app-search-bar
+            [loading]="loading()"
+            (search)="searchCity($event)"
+          ></app-search-bar>
+
+          @if (errorMessage()) {
+            <div class="error-banner">
+              <div class="error-text">
+                <strong>Error:</strong> {{ errorMessage() }}
+              </div>
+              <button
+                type="button"
+                class="dismiss-btn"
+                (click)="errorMessage.set(null)"
+                aria-label="Dismiss error"
+              >
+                &times;
+              </button>
+            </div>
+          }
+
+          @if (loading() && !currentWeather()) {
+            <div class="loading-state">
+              <div class="large-spinner"></div>
+              <p>Fetching weather telemetry...</p>
+            </div>
+          }
+
+          @if (!loading() && !currentWeather() && !errorMessage()) {
+            <div class="empty-dashboard-state">
+              <div class="empty-icon-wrapper">
+                <img src="icons/partly-cloudy.svg" alt="Search Weather" class="empty-icon" />
+              </div>
+              <h3>Discover Real-Time Weather</h3>
+              <p>Type any city name above or select a popular city to view live temperature, forecasts, and atmosphere telemetry.</p>
+            </div>
+          }
+
+          @if (currentWeather()) {
+            <div class="weather-results" [class.content-faded]="loading()">
+              <app-current-weather
+                [data]="currentWeather()"
+              ></app-current-weather>
+            </div>
+          }
+        </section>
+      } @else {
+        <section class="ai-section">
+          <app-ai-chat
+            [messages]="chatMessages()"
+            [thinking]="chatThinking()"
+            [clearing]="chatClearing()"
+            [sessions]="chatSessions()"
+            [activeSessionId]="activeSessionId()"
+            (sendMessage)="handleAiChat($event)"
+            (editMessage)="handleEditAiChat($event)"
+            (clearChat)="handleClearChat()"
+            (newChat)="handleNewChat()"
+            (selectSession)="handleSelectSession($event)"
+            (deleteSession)="handleDeleteSession($event)"
+          ></app-ai-chat>
+        </section>
+      }
     }
   </main>
 

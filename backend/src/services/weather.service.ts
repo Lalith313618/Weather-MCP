@@ -217,15 +217,15 @@ export class WeatherService {
 
     const hourlyItems: HourlyForecastItem[] = data.hourly
       ? data.hourly.time.map((time, index) => {
-          const code = data.hourly!.weather_code[index] ?? 0;
-          return {
-            time,
-            temperature: Math.round((data.hourly!.temperature_2m[index] ?? 0) * 10) / 10,
-            weatherCode: code,
-            weatherCondition: getWeatherCondition(code).description,
-            windSpeed: Math.round((data.hourly!.wind_speed_10m[index] ?? 0) * 10) / 10
-          };
-        })
+        const code = data.hourly!.weather_code[index] ?? 0;
+        return {
+          time,
+          temperature: Math.round((data.hourly!.temperature_2m[index] ?? 0) * 10) / 10,
+          weatherCode: code,
+          weatherCondition: getWeatherCondition(code).description,
+          windSpeed: Math.round((data.hourly!.wind_speed_10m[index] ?? 0) * 10) / 10
+        };
+      })
       : [];
 
     return {

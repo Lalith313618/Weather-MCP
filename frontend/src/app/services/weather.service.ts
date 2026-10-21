@@ -25,16 +25,35 @@ export class WeatherService {
     return this.http.get<HistoryResponse>(`${this.baseUrl}/weather/history`, { params });
   }
 
-  getChatMessages(): Observable<ChatHistoryResponse> {
-    return this.http.get<ChatHistoryResponse>(`${this.baseUrl}/chat/messages`);
+  getChatMessages(userEmail?: string, sessionId?: string): Observable<ChatHistoryResponse> {
+    let params = new HttpParams();
+    if (userEmail) {
+      params = params.set('user', userEmail.trim().toLowerCase());
+    }
+    if (sessionId) {
+      params = params.set('sessionId', sessionId);
+    }
+    return this.http.get<ChatHistoryResponse>(`${this.baseUrl}/chat/messages`, { params });
   }
 
-  saveChatMessage(message: { sender: 'user' | 'assistant'; text: string; time: string }): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/chat/messages`, message);
+  saveChatMessage(message: { sender: 'user' | 'assistant'; text: string; time: string }, userEmail?: string, sessionId?: string): Observable<any> {
+    const payload = {
+      ...message,
+      user: userEmail ? userEmail.trim().toLowerCase() : undefined,
+      sessionId: sessionId || undefined
+    };
+    return this.http.post<any>(`${this.baseUrl}/chat/messages`, payload);
   }
 
-  clearChatMessages(): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/chat/messages`);
+  clearChatMessages(userEmail?: string, sessionId?: string): Observable<any> {
+    let params = new HttpParams();
+    if (userEmail) {
+      params = params.set('user', userEmail.trim().toLowerCase());
+    }
+    if (sessionId) {
+      params = params.set('sessionId', sessionId);
+    }
+    return this.http.delete<any>(`${this.baseUrl}/chat/messages`, { params });
   }
 
   sendAiChat(message: string, history: Array<{ sender: 'user' | 'assistant'; text: string }> = []): Observable<{ success: boolean; reply: string; error?: string }> {

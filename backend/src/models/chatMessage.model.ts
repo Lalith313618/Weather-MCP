@@ -4,6 +4,8 @@ export interface IChatMessage extends Document {
   sender: "user" | "assistant";
   text: string;
   time: string;
+  user?: string | null;
+  sessionId?: string | null;
   createdAt: Date;
 }
 
@@ -21,6 +23,18 @@ const chatMessageSchema = new Schema<IChatMessage>(
     time: {
       type: String,
       required: true
+    },
+    user: {
+      type: String,
+      required: false,
+      default: null,
+      index: true
+    },
+    sessionId: {
+      type: String,
+      required: false,
+      default: null,
+      index: true
     },
     createdAt: {
       type: Date,

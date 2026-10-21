@@ -1,112 +1,200 @@
-<div class="ai-chat-card">
-  <div class="chat-header">
-    <div class="header-info">
-      <div class="bot-avatar">
-        <img src="icons/bot.svg" alt="AI Bot" class="bot-img-icon" />
+<div class="ai-chat-layout">
+  <aside class="chat-history-sidebar" [class.collapsed]="!showHistory()">
+    <div class="history-sidebar-header">
+      <div class="history-header-title">
+        <img src="icons/clock.svg" alt="History" class="history-icon-img" />
+        <span>Chat History</span>
       </div>
-      <div>
-        <h4>Weather AI Assistant</h4>
-        <p>MCP Agent Assistant</p>
-      </div>
-    </div>
-
-    <div class="header-actions">
       <button
         type="button"
-        class="clear-chat-btn"
-        (click)="onClear()"
-        [disabled]="clearing() || thinking()"
-        title="Clear conversation and database records"
+        class="sidebar-close-btn"
+        (click)="toggleHistory()"
+        title="Hide history sidebar"
+        aria-label="Hide history sidebar"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 6h18"/>
-          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
-          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
-          <line x1="10" y1="11" x2="10" y2="17"/>
-          <line x1="14" y1="11" x2="14" y2="17"/>
-        </svg>
-        <span>{{ clearing() ? 'Clearing...' : 'Clear Chat' }}</span>
+        &times;
       </button>
     </div>
-  </div>
 
-  <div class="chat-messages" #messagesContainer>
-    @for (msg of messages(); track $index) {
-      <div class="message-bubble" [class.user-bubble]="msg.sender === 'user'" [class.assistant-bubble]="msg.sender === 'assistant'">
-        <div class="bubble-header">
-          <div class="sender-info">
-            <span class="sender-name">{{ msg.sender === 'user' ? 'You' : 'Weather MCP ' }}</span>
-            @if (msg.edited) {
-              <span class="edited-badge">(edited)</span>
-            }
-          </div>
-          <div class="bubble-meta">
-            <span class="msg-time">{{ msg.time }}</span>
-            @if (msg.sender === 'user' && editingIndex() !== $index) {
-              <button
-                type="button"
-                class="edit-msg-btn"
-                (click)="startEdit($index, msg.text)"
-                [disabled]="thinking() || clearing()"
-                title="Edit this question"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-                <span>Edit</span>
-              </button>
-            }
-          </div>
+    <div class="new-chat-section">
+      <button
+        type="button"
+        class="new-chat-btn"
+        (click)="onNewChat()"
+        [disabled]="thinking() || clearing()"
+        title="Start a new chat conversation"
+      >
+        <img src="icons/plus.svg" alt="New Chat" class="btn-icon-img" />
+        <span>New Chat</span>
+      </button>
+    </div>
+
+    <div class="history-sessions-list">
+      @if (sessions().length === 0) {
+        <div class="empty-history-state">
+          <img src="icons/chat.svg" alt="No chats" class="empty-history-img" />
+          <p>No chat history yet</p>
+          <small>Click "+ New Chat" to start a new weather conversation.</small>
         </div>
+      } @else {
+        @for (s of sessions(); track s.id) {
+          <div
+            class="history-session-item"
+            [class.active]="s.id === activeSessionId()"
+            (click)="onSelectSession(s.id)"
+            title="Open conversation"
+          >
+            <div class="session-item-body">
+              <img src="icons/chat.svg" alt="Chat" class="session-chat-icon" />
+              <div class="session-info">
+                <span class="session-title">{{ s.title }}</span>
+                @if (s.updatedAt) {
+                  <span class="session-time">{{ s.updatedAt }}</span>
+                }
+              </div>
+            </div>
 
-        @if (editingIndex() === $index) {
-          <div class="edit-msg-box">
-            <textarea
-              class="edit-msg-input"
-              [(ngModel)]="editingText"
-              rows="2"
-              (keydown.enter)="$event.preventDefault(); saveEdit($index)"
-              (keydown.escape)="cancelEdit()"
-              placeholder="Edit your question..."
-            ></textarea>
-            <div class="edit-actions">
-              <button type="button" class="edit-cancel-btn" (click)="cancelEdit()">Cancel</button>
-              <button
-                type="button"
-                class="edit-save-btn"
-                (click)="saveEdit($index)"
-                [disabled]="!editingText().trim()"
-              >
-                Save & Submit
-              </button>
+            <button
+              type="button"
+              class="delete-session-btn"
+              (click)="onDeleteSession($event, s.id)"
+              title="Delete conversation"
+              aria-label="Delete conversation"
+            >
+              <img src="icons/trash.svg" alt="Delete" class="trash-icon-img" />
+            </button>
+          </div>
+        }
+      }
+    </div>
+  </aside>
+  @if (showHistory()) {
+    <div class="history-backdrop" (click)="toggleHistory()"></div>
+  }
+
+  <div class="ai-chat-card">
+    <div class="chat-header">
+      <div class="header-info">
+        <button
+          type="button"
+          class="history-toggle-btn"
+          [class.active]="showHistory()"
+          (click)="toggleHistory()"
+          [title]="showHistory() ? 'Hide Chat History' : 'Open Chat History'"
+        >
+          <img src="icons/clock.svg" alt="History" class="btn-icon-img" />
+          <span>{{ showHistory() ? 'Hide History' : 'Chat History' }}</span>
+        </button>
+
+        <div class="bot-avatar">
+          <img src="icons/bot.svg" alt="AI Bot" class="bot-img-icon" />
+        </div>
+        <div>
+          <h4>Weather AI Assistant</h4>
+          <p>MCP Agent Assistant</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button
+          type="button"
+          class="header-new-chat-btn"
+          (click)="onNewChat()"
+          [disabled]="thinking() || clearing()"
+          title="Start a new chat conversation"
+        >
+          <img src="icons/plus.svg" alt="New Chat" class="btn-icon-img" />
+          <span>New Chat</span>
+        </button>
+
+        <button
+          type="button"
+          class="clear-chat-btn"
+          (click)="onClear()"
+          [disabled]="clearing() || thinking()"
+          title="Clear messages in this conversation"
+        >
+          <img src="icons/trash.svg" alt="Clear" class="trash-icon-img" />
+          <span>{{ clearing() ? 'Clearing...' : 'Clear Chat' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-messages" #messagesContainer>
+      @for (msg of messages(); track $index) {
+        <div class="message-bubble" [class.user-bubble]="msg.sender === 'user'" [class.assistant-bubble]="msg.sender === 'assistant'">
+          <div class="bubble-header">
+            <div class="sender-info">
+              <span class="sender-name">{{ msg.sender === 'user' ? 'You' : 'Weather MCP' }}</span>
+              @if (msg.edited) {
+                <span class="edited-badge">(edited)</span>
+              }
+            </div>
+            <div class="bubble-meta">
+              <span class="msg-time">{{ msg.time }}</span>
+              @if (msg.sender === 'user' && editingIndex() !== $index) {
+                <button
+                  type="button"
+                  class="edit-msg-btn"
+                  (click)="startEdit($index, msg.text)"
+                  [disabled]="thinking() || clearing()"
+                  title="Edit this question"
+                >
+                  <img src="icons/edit.svg" alt="Edit" class="edit-icon-img" />
+                  <span>Edit</span>
+                </button>
+              }
             </div>
           </div>
-        } @else {
-          <p class="bubble-text">{{ formatMessage(msg.text) }}</p>
-        }
-      </div>
-    }
 
-    @if (thinking()) {
-      <div class="message-bubble assistant-bubble thinking-bubble">
-        <span class="typing-dot"></span>
-        <span class="typing-dot"></span>
-        <span class="typing-dot"></span>
-      </div>
-    }
+          @if (editingIndex() === $index) {
+            <div class="edit-msg-box">
+              <textarea
+                class="edit-msg-input"
+                [(ngModel)]="editingText"
+                rows="2"
+                (keydown.enter)="$event.preventDefault(); saveEdit($index)"
+                (keydown.escape)="cancelEdit()"
+                placeholder="Edit your question..."
+              ></textarea>
+              <div class="edit-actions">
+                <button type="button" class="edit-cancel-btn" (click)="cancelEdit()">Cancel</button>
+                <button
+                  type="button"
+                  class="edit-save-btn"
+                  (click)="saveEdit($index)"
+                  [disabled]="!editingText().trim()"
+                >
+                  Save & Submit
+                </button>
+              </div>
+            </div>
+          } @else {
+            <p class="bubble-text">{{ formatMessage(msg.text) }}</p>
+          }
+        </div>
+      }
+
+      @if (thinking()) {
+        <div class="message-bubble assistant-bubble thinking-bubble">
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+        </div>
+      }
+    </div>
+
+    <form class="chat-input-form" (ngSubmit)="send()">
+      <input
+        type="text"
+        [(ngModel)]="inputText"
+        name="chatQuery"
+        placeholder="Ask weather (e.g. Bangalore, Mumbai vs Delhi)"
+        [disabled]="thinking() || clearing()"
+      />
+      <button type="submit" class="send-btn" [disabled]="thinking() || clearing() || !inputText().trim()">
+        <img src="icons/send.svg" alt="Send" class="send-img-icon" />
+      </button>
+    </form>
   </div>
-
-  <form class="chat-input-form" (ngSubmit)="send()">
-    <input
-      type="text"
-      [(ngModel)]="inputText"
-      name="chatQuery"
-      placeholder="Ask weather (e.g. Bangalore, Mumbai vs Delhi)"
-      [disabled]="thinking() || clearing()"
-    />
-    <button type="submit" class="send-btn" [disabled]="thinking() || clearing() || !inputText().trim()">
-      <img src="icons/send.svg" alt="Send" class="send-img-icon" />
-    </button>
-  </form>
 </div>

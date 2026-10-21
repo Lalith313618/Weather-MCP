@@ -35,7 +35,13 @@ export class ChatController {
 
   public static async getMessages(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const messages = await ChatMessage.find()
+      const user = req.query.user as string;
+      const sessionId = req.query.sessionId as string;
+      const filter: any = {};
+      if (user) filter.user = user.toLowerCase().trim();
+      if (sessionId) filter.sessionId = sessionId;
+
+      const messages = await ChatMessage.find(filter)
         .sort({ createdAt: 1 })
         .lean();
 
@@ -47,6 +53,8 @@ export class ChatController {
           sender: m.sender,
           text: m.text,
           time: m.time,
+          user: m.user,
+          sessionId: m.sessionId,
           createdAt: m.createdAt
         }))
       });
@@ -57,7 +65,7 @@ export class ChatController {
 
   public static async saveMessage(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { sender, text, time } = req.body;
+      const { sender, text, time, user, sessionId } = req.body;
 
       if (!sender || !["user", "assistant"].includes(sender)) {
         res.status(400).json({
@@ -77,12 +85,16 @@ export class ChatController {
 
       const formattedTime = time || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-      const saved = await ChatMessage.create({
+      const newMsg = new ChatMessage({
         sender,
         text: text.trim(),
         time: formattedTime,
+        user: user ? String(user).toLowerCase().trim() : null,
+        sessionId: sessionId ? String(sessionId) : null,
         createdAt: new Date()
       });
+
+      const saved = await newMsg.save();
 
       res.status(201).json({
         success: true,
@@ -91,6 +103,8 @@ export class ChatController {
           sender: saved.sender,
           text: saved.text,
           time: saved.time,
+          user: saved.user,
+          sessionId: saved.sessionId,
           createdAt: saved.createdAt
         }
       });
@@ -101,13 +115,18 @@ export class ChatController {
 
   public static async clearMessages(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      
-      const chatDeleteResult = await ChatMessage.deleteMany({});
-      const searchDeleteResult = await WeatherSearch.deleteMany({});
+      const user = req.query.user as string;
+      const sessionId = req.query.sessionId as string;
+      const filter: any = {};
+      if (user) filter.user = user.toLowerCase().trim();
+      if (sessionId) filter.sessionId = sessionId;
+
+      const chatDeleteResult = await ChatMessage.deleteMany(filter);
+      const searchDeleteResult = await WeatherSearch.deleteMany(filter);
 
       res.json({
         success: true,
-        message: "Chat messages and search history successfully cleared from database",
+        message: "Chat messages successfully cleared for user",
         deletedChatsCount: chatDeleteResult.deletedCount,
         deletedSearchesCount: searchDeleteResult.deletedCount
       });

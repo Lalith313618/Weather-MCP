@@ -8,6 +8,15 @@ export interface ChatMessage {
   edited?: boolean;
 }
 
+export interface ChatSession {
+  id: string;
+  title: string;
+  userEmail?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  messages: ChatMessage[];
+}
+
 @Component({
   selector: 'app-ai-chat',
   standalone: true,
@@ -19,13 +28,20 @@ export class AiChatComponent {
   messages = input<ChatMessage[]>([]);
   thinking = input<boolean>(false);
   clearing = input<boolean>(false);
+  sessions = input<ChatSession[]>([]);
+  activeSessionId = input<string>('');
+
   sendMessage = output<string>();
   editMessage = output<{ index: number; newText: string }>();
   clearChat = output<void>();
+  newChat = output<void>();
+  selectSession = output<string>();
+  deleteSession = output<string>();
 
   inputText = signal('');
   editingIndex = signal<number | null>(null);
   editingText = signal<string>('');
+  showHistory = signal<boolean>(true);
   messagesContainer = viewChild<ElementRef<HTMLDivElement>>('messagesContainer');
 
   constructor() {
@@ -39,6 +55,23 @@ export class AiChatComponent {
         }
       }, 50);
     });
+  }
+
+  toggleHistory(): void {
+    this.showHistory.update((v) => !v);
+  }
+
+  onNewChat(): void {
+    this.newChat.emit();
+  }
+
+  onSelectSession(id: string): void {
+    this.selectSession.emit(id);
+  }
+
+  onDeleteSession(event: MouseEvent, id: string): void {
+    event.stopPropagation();
+    this.deleteSession.emit(id);
   }
 
   send(): void {

@@ -78,6 +78,8 @@ export interface ChatMessageItem {
   sender: 'user' | 'assistant';
   text: string;
   time: string;
+  user?: string;
+  sessionId?: string;
   createdAt?: string;
 }
 
