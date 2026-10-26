@@ -158,6 +158,8 @@
   width: 100%;
   display: flex;
   justify-content: center;
+  flex: 1;
+  min-height: 0;
 }
 
 .app-footer {
@@ -221,24 +223,46 @@
   }
 
   .main-content.wide-layout {
-    padding: 0.85rem 0.75rem 2rem;
+    padding: 0.75rem 0.75rem 0.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
   .app-footer {
     padding: 0.75rem 0.85rem;
+    gap: 0.55rem;
   }
 
   .footer-pills {
-    gap: 0.35rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.45rem;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
   }
 
   .pill {
-    font-size: 0.72rem;
-    padding: 0.25rem 0.65rem;
+    width: 100%;
+    justify-content: center;
+    font-size: 0.7rem;
+    padding: 0.32rem 0.45rem;
+    gap: 0.35rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .footer-img-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
   }
 
   .copyright {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     text-align: center;
+    line-height: 1.4;
   }
 }

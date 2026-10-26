@@ -177,13 +177,13 @@
 @media (max-width: 768px) {
   .app-header {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr auto;
     grid-template-areas:
       "left right"
       "center center";
     row-gap: 0.55rem;
-    column-gap: 0.5rem;
-    padding: 0.55rem 0.85rem;
+    column-gap: 0.75rem;
+    padding: 0.5rem 0.85rem;
     align-items: center;
   }
 
@@ -192,6 +192,7 @@
     display: flex;
     align-items: center;
     min-width: 0;
+    overflow: hidden;
   }
 
   .header-right {
@@ -200,6 +201,7 @@
     justify-content: flex-end;
     align-items: center;
     min-width: 0;
+    justify-self: end;
   }
 
   .header-center {
@@ -231,44 +233,48 @@
   }
 
   .brand {
-    gap: 0.45rem;
+    gap: 0.4rem;
+    min-width: 0;
   }
 
   .brand-text h1 {
-    font-size: 1.05rem;
+    font-size: 0.98rem;
     font-weight: 800;
     white-space: nowrap;
+    letter-spacing: -0.01em;
   }
 
   .logo-icon {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: var(--radius-sm);
+    flex-shrink: 0;
   }
 
   .brand-logo-img {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
 
   .nav-links {
     gap: 0.35rem;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
   }
 
   .user-badge {
-    max-width: 95px;
-    font-size: 0.72rem;
-    padding: 0.28rem 0.5rem;
+    max-width: 78px;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.45rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .logout-btn span {
-    padding: 0.3rem 0.65rem;
-    font-size: 0.74rem;
+    padding: 0.28rem 0.55rem;
+    font-size: 0.72rem;
     white-space: nowrap;
   }
 }
