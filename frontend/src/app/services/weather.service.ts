@@ -8,7 +8,7 @@ import { WeatherResponse, ForecastResponse, HistoryResponse, ChatHistoryResponse
 })
 export class WeatherService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:5001/api';
+  private readonly baseUrl = 'https://weather-mcp-9wg8.onrender.com';
 
   getCurrentWeather(city: string): Observable<WeatherResponse> {
     const params = new HttpParams().set('city', city.trim());
