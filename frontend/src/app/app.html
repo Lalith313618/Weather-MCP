@@ -1,15 +1,16 @@
-<div [class]="'app-shell ' + currentTheme()" [class.auth-shell]="!authService.isLoggedIn()">
+<div [class]="'app-shell ' + currentTheme()" [class.auth-shell]="isLoginPage()">
   <app-header
     [activeTab]="activeTab()"
+    [isLoginPage]="isLoginPage()"
     (tabChange)="switchTab($event)"
   ></app-header>
 
   <main
     class="main-content"
-    [class.wide-layout]="activeTab() === 'ai-chat'"
-    [class.auth-layout]="!authService.isLoggedIn()"
+    [class.wide-layout]="activeTab() === 'ai-chat' && !isLoginPage()"
+    [class.auth-layout]="isLoginPage()"
   >
-    @if (!authService.isLoggedIn()) {
+    @if (isLoginPage()) {
       <app-login></app-login>
     } @else {
 

@@ -29,7 +29,8 @@ export class App implements OnInit {
   private readonly router = inject(Router, { optional: true });
   readonly authService = inject(AuthService);
 
-  readonly isLoginPage = signal<boolean>(false);
+  readonly isLoginPage = computed<boolean>(() => !this.authService.isLoggedIn());
+
   readonly currentWeather = signal<CurrentWeather | null>(null);
 
   readonly loading = signal<boolean>(false);
@@ -94,15 +95,6 @@ export class App implements OnInit {
         this.activeSessionId.set('');
       }
     });
-
-    if (this.router) {
-      this.isLoginPage.set(this.router.url.includes('/login'));
-      this.router.events.subscribe((event) => {
-        if (event instanceof NavigationEnd) {
-          this.isLoginPage.set(event.urlAfterRedirects.includes('/login'));
-        }
-      });
-    }
   }
 
   switchTab(tab: 'dashboard' | 'ai-chat'): void {

@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -18,12 +18,14 @@ export class Login implements OnInit {
   private readonly route = inject(ActivatedRoute, { optional: true });
   private readonly authService = inject(AuthService);
 
+  readonly backToDashboard = output<void>();
+
   name = '';
   email = '';
   password = '';
-  rememberMe = true;
+  rememberMe = false;
 
-  readonly viewState = signal<AuthViewState>('welcome');
+  readonly viewState = signal<AuthViewState>('login');
   readonly showPassword = signal<boolean>(false);
   readonly loading = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
@@ -34,10 +36,10 @@ export class Login implements OnInit {
         const view = params['view'] || params['mode'];
         if (view === 'register') {
           this.viewState.set('register');
-        } else if (view === 'login') {
-          this.viewState.set('login');
-        } else {
+        } else if (view === 'welcome') {
           this.viewState.set('welcome');
+        } else {
+          this.viewState.set('login');
         }
       });
     }
@@ -51,11 +53,19 @@ export class Login implements OnInit {
     }
   }
 
+  goBackToHome(): void {
+    this.errorMessage.set(null);
+    this.backToDashboard.emit();
+    if (this.router) {
+      this.router.navigate(['/'], { queryParams: { view: 'dashboard' } });
+    }
+  }
+
   goBackToWelcome(): void {
     this.viewState.set('welcome');
     this.errorMessage.set(null);
     if (this.router) {
-      this.router.navigate([], { queryParams: {} });
+      this.router.navigate([], { queryParams: { view: 'welcome' } });
     }
   }
 
@@ -89,13 +99,13 @@ export class Login implements OnInit {
       this.loading.set(false);
 
       if (this.viewState() === 'register') {
-        const res = this.authService.register(this.name, this.email, this.password);
+        const res = this.authService.register(this.name, this.email, this.password, this.rememberMe);
         if (!res.success) {
           this.errorMessage.set(res.error || 'Registration failed');
           return;
         }
       } else {
-        const res = this.authService.login(this.email, this.password);
+        const res = this.authService.login(this.email, this.password, this.rememberMe);
         if (!res.success) {
           this.errorMessage.set(res.error || 'Login failed');
           return;

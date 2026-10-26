@@ -25,38 +25,58 @@ export class AuthService {
   }
 
   checkInitialAuth(): void {
-    if (typeof localStorage !== 'undefined') {
-      const stored = localStorage.getItem('weather_mcp_user');
-      if (stored) {
+    // Preserve active session across page refreshes via sessionStorage
+    if (typeof sessionStorage !== 'undefined') {
+      const sessionStored = sessionStorage.getItem('weather_mcp_user');
+      if (sessionStored) {
         try {
-          const user = JSON.parse(stored);
+          const user = JSON.parse(sessionStored);
           this.currentUser.set(user.name || user.email || 'User');
           this.currentUserEmail.set(user.email || null);
           this.isLoggedIn.set(true);
+          return;
         } catch {
-          this.currentUser.set(stored);
-          this.currentUserEmail.set(stored);
+          this.currentUser.set(sessionStored);
+          this.currentUserEmail.set(sessionStored);
           this.isLoggedIn.set(true);
+          return;
         }
-      } else {
-        this.currentUser.set(null);
-        this.currentUserEmail.set(null);
-        this.isLoggedIn.set(false);
       }
     }
+
+    this.currentUser.set(null);
+    this.currentUserEmail.set(null);
+    this.isLoggedIn.set(false);
   }
 
   getRegisteredUsers(): UserAccount[] {
     if (typeof localStorage === 'undefined') return [];
     try {
       const stored = localStorage.getItem('weather_mcp_registered_users');
-      return stored ? JSON.parse(stored) : [];
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+
+      // Seed a default demo account for immediate sign-in convenience
+      const demoUsers: UserAccount[] = [
+        {
+          name: 'Demo User',
+          email: 'demo@example.com',
+          password: 'password123',
+          createdAt: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem('weather_mcp_registered_users', JSON.stringify(demoUsers));
+      return demoUsers;
     } catch {
       return [];
     }
   }
 
-  register(name: string, email: string, password: string): { success: boolean; error?: string } {
+  register(name: string, email: string, password: string, remember = false): { success: boolean; error?: string } {
     const trimmedName = name.trim();
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedPassword = password.trim();
@@ -99,11 +119,11 @@ export class AuthService {
       localStorage.setItem('weather_mcp_registered_users', JSON.stringify(users));
     }
 
-    this.setCurrentSession(newUser);
+    this.setCurrentSession(newUser, remember);
     return { success: true };
   }
 
-  login(identifier: string, password: string): { success: boolean; error?: string } {
+  login(identifier: string, password: string, remember = false): { success: boolean; error?: string } {
     const trimmedId = identifier.trim().toLowerCase();
     const trimmedPassword = password.trim();
 
@@ -134,13 +154,22 @@ export class AuthService {
       };
     }
 
-    this.setCurrentSession(user);
+    this.setCurrentSession(user, remember);
     return { success: true };
   }
 
-  private setCurrentSession(user: UserAccount): void {
+  private setCurrentSession(user: UserAccount, remember = false): void {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('weather_mcp_user', JSON.stringify(user));
+    }
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('weather_mcp_user', JSON.stringify(user));
+      if (remember) {
+        localStorage.setItem('weather_mcp_remember_me', 'true');
+        localStorage.setItem('weather_mcp_user', JSON.stringify(user));
+      } else {
+        localStorage.removeItem('weather_mcp_remember_me');
+        localStorage.removeItem('weather_mcp_user');
+      }
     }
     this.currentUser.set(user.name);
     this.currentUserEmail.set(user.email);
@@ -149,8 +178,12 @@ export class AuthService {
   }
 
   logout(): void {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('weather_mcp_user');
+    }
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem('weather_mcp_user');
+      localStorage.removeItem('weather_mcp_remember_me');
       try {
         localStorage.setItem('weather_mcp_tab', 'dashboard');
       } catch (e) {}
@@ -160,7 +193,7 @@ export class AuthService {
     this.isLoggedIn.set(false);
     this.authStateChanged.next({ isLoggedIn: false, email: null });
     if (this.router) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/'], { queryParams: { view: 'login' } });
     }
   }
 }

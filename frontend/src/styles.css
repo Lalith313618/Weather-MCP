@@ -6,8 +6,6 @@
   --radius-lg: 24px;
   --radius-xl: 32px;
   --glass-blur: 20px;
-
-  /* Default fixed calm modern dark-teal glassmorphic palette (Image 2) */
   --theme-bg-gradient: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%);
   --theme-card-bg: rgba(255, 255, 255, 0.10);
   --theme-card-border: rgba(255, 255, 255, 0.16);
@@ -23,7 +21,6 @@
   --theme-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
 }
 
-/* Clear / Sunny Palette */
 .theme-sunny {
   --theme-bg-gradient: linear-gradient(135deg, #FFD97D 0%, #FF9A76 100%);
   --theme-card-bg: rgba(255, 255, 255, 0.25);
@@ -40,7 +37,6 @@
   --theme-shadow: 0 16px 36px rgba(232, 80, 42, 0.18);
 }
 
-/* Clear Night Palette */
 .theme-night {
   --theme-bg-gradient: linear-gradient(135deg, #0F2027 0%, #203A43 50%, #2C5364 100%);
   --theme-card-bg: rgba(255, 255, 255, 0.10);
@@ -57,7 +53,6 @@
   --theme-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
 }
 
-/* Cloudy Palette */
 .theme-cloudy {
   --theme-bg-gradient: linear-gradient(135deg, #bdc3c7 0%, #7F8FA6 100%);
   --theme-card-bg: rgba(255, 255, 255, 0.30);

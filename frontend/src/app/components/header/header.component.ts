@@ -10,27 +10,17 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   readonly authService = inject(AuthService);
   private readonly router = inject(Router, { optional: true });
 
-  readonly isLoginPage = signal<boolean>(false);
+  readonly isLoginPage = input<boolean>(false);
   readonly activeTab = input<'dashboard' | 'ai-chat'>('dashboard');
   readonly tabChange = output<'dashboard' | 'ai-chat'>();
+  readonly openAuth = output<'login' | 'register'>();
 
   switchTab(tab: 'dashboard' | 'ai-chat'): void {
     this.tabChange.emit(tab);
-  }
-
-  ngOnInit(): void {
-    if (this.router) {
-      this.isLoginPage.set(this.router.url.includes('/login'));
-      this.router.events.subscribe((event) => {
-        if (event instanceof NavigationEnd) {
-          this.isLoginPage.set(event.urlAfterRedirects.includes('/login'));
-        }
-      });
-    }
   }
 
   handleLogout(): void {

@@ -10,7 +10,7 @@
     </a>
   </div>
 
-  @if (authService.isLoggedIn()) {
+  @if (authService.isLoggedIn() && !isLoginPage()) {
     <div class="header-center">
       <nav class="nav-tabs" aria-label="Main Navigation">
         <button
@@ -44,10 +44,10 @@
         <span>Logout</span>
       </button>
     } @else {
-      <a class="nav-login-btn" routerLink="/" [queryParams]="{ view: 'login' }">
+      <a class="nav-login-btn" routerLink="/" [queryParams]="{ view: 'login' }" (click)="openAuth.emit('login')">
         <span>Login</span>
       </a>
-      <a class="nav-register-btn" routerLink="/" [queryParams]="{ view: 'register' }">
+      <a class="nav-register-btn" routerLink="/" [queryParams]="{ view: 'register' }" (click)="openAuth.emit('register')">
         <span>Register</span>
       </a>
     }
