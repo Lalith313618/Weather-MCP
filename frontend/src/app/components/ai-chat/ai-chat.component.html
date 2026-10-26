@@ -74,7 +74,17 @@
 
   <div class="ai-chat-card">
     <div class="chat-header">
-      <div class="header-info">
+      <div class="header-top-row">
+        <div class="header-identity">
+          <div class="bot-avatar">
+            <img src="icons/bot.svg" alt="AI Bot" class="bot-img-icon" />
+          </div>
+          <div class="bot-title-group">
+            <h4>Weather AI Assistant</h4>
+            <p>MCP Agent Assistant</p>
+          </div>
+        </div>
+
         <button
           type="button"
           class="history-toggle-btn"
@@ -85,14 +95,6 @@
           <img src="icons/clock.svg" alt="History" class="btn-icon-img" />
           <span>{{ showHistory() ? 'Hide History' : 'Chat History' }}</span>
         </button>
-
-        <div class="bot-avatar">
-          <img src="icons/bot.svg" alt="AI Bot" class="bot-img-icon" />
-        </div>
-        <div>
-          <h4>Weather AI Assistant</h4>
-          <p>MCP Agent Assistant</p>
-        </div>
       </div>
 
       <div class="header-actions">
