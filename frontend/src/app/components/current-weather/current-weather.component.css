@@ -225,16 +225,92 @@
 
 @media (max-width: 640px) {
   .weather-hero-card {
-    padding: 1.75rem 1.5rem;
+    padding: 1.35rem 1rem;
+    border-radius: var(--radius-lg);
   }
+
+  .city-name {
+    font-size: 1.85rem;
+  }
+
+  .loc-img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .country-badge {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .coords-info {
+    font-size: 0.78rem;
+    margin-top: 0.25rem;
+  }
+
+  .condition-badge {
+    padding: 0.35rem 0.85rem;
+    gap: 0.45rem;
+  }
+
+  .condition-badge-img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .condition-text {
+    font-size: 0.82rem;
+  }
+
+  .hero-main {
+    margin: 1.25rem 0 0.75rem 0;
+  }
+
   .temp-value {
-    font-size: 4.2rem;
+    font-size: 3.2rem;
   }
+
+  .temp-unit {
+    font-size: 1.6rem;
+  }
+
   .hero-weather-img {
-    width: 86px;
-    height: 86px;
+    width: 70px;
+    height: 70px;
   }
+
+  .feels-like {
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+  }
+
   .metrics-grid {
     grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .metric-item {
+    padding: 0.7rem 0.75rem;
+    gap: 0.55rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .metric-icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .metric-img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .metric-label {
+    font-size: 0.66rem;
+  }
+
+  .metric-value {
+    font-size: 0.95rem;
   }
 }

@@ -41,7 +41,7 @@ export class AiChatComponent {
   inputText = signal('');
   editingIndex = signal<number | null>(null);
   editingText = signal<string>('');
-  showHistory = signal<boolean>(true);
+  showHistory = signal<boolean>(typeof window !== 'undefined' ? window.innerWidth > 1024 : false);
   messagesContainer = viewChild<ElementRef<HTMLDivElement>>('messagesContainer');
 
   constructor() {
@@ -62,10 +62,16 @@ export class AiChatComponent {
   }
 
   onNewChat(): void {
+    if (typeof window !== 'undefined' && window.innerWidth <= 1024) {
+      this.showHistory.set(false);
+    }
     this.newChat.emit();
   }
 
   onSelectSession(id: string): void {
+    if (typeof window !== 'undefined' && window.innerWidth <= 1024) {
+      this.showHistory.set(false);
+    }
     this.selectSession.emit(id);
   }
 

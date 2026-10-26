@@ -156,9 +156,39 @@ input:focus {
 @media (max-width: 640px) {
   .search-form {
     flex-direction: column;
+    gap: 0.65rem;
   }
+
+  input {
+    padding: 0.85rem 2.6rem;
+    font-size: 0.92rem;
+  }
+
+  .search-img-icon {
+    left: 0.95rem;
+    width: 18px;
+    height: 18px;
+  }
+
   .submit-btn {
     width: 100%;
     justify-content: center;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .quick-cities {
+    gap: 0.35rem;
+    margin-top: 0.75rem;
+    padding: 0 0.2rem;
+  }
+
+  .quick-label {
+    font-size: 0.75rem;
+  }
+
+  .city-chip {
+    padding: 0.25rem 0.65rem;
+    font-size: 0.75rem;
   }
 }

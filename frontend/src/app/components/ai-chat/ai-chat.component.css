@@ -250,9 +250,10 @@
 }
 
 .ai-chat-card {
-  width: 800px;
-  max-width: 100%;
-  flex-shrink: 0;
+  width: 100%;
+  max-width: 800px;
+  flex: 1 1 auto;
+  min-width: 0;
   background: var(--theme-card-bg);
   border: 1px solid var(--theme-card-border);
   border-radius: var(--radius-xl);
@@ -263,8 +264,8 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  min-width: 0;
   transition: all 0.35s ease;
+  box-sizing: border-box;
 }
 
 .chat-header {
@@ -636,6 +637,90 @@
   }
 }
 
+@media (max-width: 768px) {
+  .ai-chat-card {
+    padding: 1.15rem 0.85rem;
+    border-radius: var(--radius-lg);
+    gap: 0.85rem;
+  }
+
+  .chat-header {
+    gap: 0.55rem;
+    padding-bottom: 0.65rem;
+  }
+
+  .header-info {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.55rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 0.4rem;
+  }
+
+  .bot-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .bot-img-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .header-info h4 {
+    font-size: 0.95rem;
+  }
+
+  .header-info p {
+    font-size: 0.7rem;
+  }
+
+  .history-toggle-btn,
+  .header-new-chat-btn,
+  .clear-chat-btn {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.75rem;
+    gap: 0.35rem;
+  }
+
+  .chat-messages {
+    max-height: 400px;
+    min-height: 200px;
+    padding-right: 0.2rem;
+    gap: 0.75rem;
+  }
+
+  .message-bubble {
+    max-width: 92%;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.88rem;
+  }
+
+  .chat-input-form {
+    gap: 0.45rem;
+  }
+
+  .chat-input-form input {
+    padding: 0.75rem 0.85rem;
+    font-size: 0.88rem;
+    border-radius: var(--radius-md);
+  }
+
+  .send-btn {
+    padding: 0 1rem;
+    border-radius: var(--radius-md);
+  }
+
+  .send-img-icon {
+    width: 17px;
+    height: 17px;
+  }
+}
+
 @media (max-width: 600px) {
   .chat-history-sidebar {
     top: 0;
@@ -647,6 +732,7 @@
     border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
   }
 }
-.chat-input-form input::placeholder{
-  color:lightblue;
+
+.chat-input-form input::placeholder {
+  color: lightblue;
 }
