@@ -174,83 +174,102 @@
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 768px) {
   .app-header {
-    padding: 0.75rem 1rem;
-    flex-wrap: wrap;
-    row-gap: 0.65rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "left right"
+      "center center";
+    row-gap: 0.55rem;
+    column-gap: 0.5rem;
+    padding: 0.55rem 0.85rem;
+    align-items: center;
   }
 
   .header-left {
-    flex: 1 1 auto;
+    grid-area: left;
+    display: flex;
+    align-items: center;
     min-width: 0;
   }
 
   .header-right {
-    flex: 0 0 auto;
+    grid-area: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-width: 0;
   }
 
   .header-center {
-    order: 3;
+    grid-area: center;
     width: 100%;
+    display: flex;
     justify-content: center;
-  }
-}
-
-@media (max-width: 520px) {
-  .app-header {
-    padding: 0.6rem 0.75rem;
-    row-gap: 0.55rem;
   }
 
   .nav-tabs {
     width: 100%;
     display: flex;
     justify-content: center;
-    gap: 0.45rem;
+    gap: 0.4rem;
   }
 
   .tab-btn {
     flex: 1;
     max-width: 180px;
     justify-content: center;
-    padding: 0.45rem 0.65rem;
-    font-size: 0.8rem;
+    padding: 0.42rem 0.6rem;
+    font-size: 0.78rem;
     gap: 0.35rem;
   }
 
+  .pill-badge {
+    font-size: 0.62rem;
+    padding: 0.15rem 0.35rem;
+  }
+
   .brand {
-    gap: 0.5rem;
+    gap: 0.45rem;
   }
 
   .brand-text h1 {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
+    font-weight: 800;
+    white-space: nowrap;
   }
 
   .logo-icon {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border-radius: var(--radius-sm);
   }
 
   .brand-logo-img {
-    width: 22px;
-    height: 22px;
-  }
-
-  .user-badge {
-    max-width: 105px;
-    font-size: 0.74rem;
-    padding: 0.35rem 0.6rem;
-  }
-
-  .logout-btn span {
-    padding: 0.38rem 0.7rem;
-    font-size: 0.76rem;
+    width: 20px;
+    height: 20px;
   }
 
   .nav-links {
-    gap: 0.4rem;
+    gap: 0.35rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .user-badge {
+    max-width: 95px;
+    font-size: 0.72rem;
+    padding: 0.28rem 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .logout-btn span {
+    padding: 0.3rem 0.65rem;
+    font-size: 0.74rem;
+    white-space: nowrap;
   }
 }
 
