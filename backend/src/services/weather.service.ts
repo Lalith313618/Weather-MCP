@@ -141,7 +141,6 @@ export class WeatherService {
     } catch (err: any) {
       if (err.statusCode === 404) throw err;
 
-      // Fallback geocoding via wttr.in if Open-Meteo returns 429 or network error
       try {
         const wttrData = await this.fetchWttrIn(trimmedCity);
         const area = wttrData.nearest_area?.[0];
