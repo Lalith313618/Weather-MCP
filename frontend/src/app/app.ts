@@ -306,12 +306,21 @@ export class App implements OnInit {
 
   private cleanBotText(text: string): string {
     if (!text) return '';
-    return text
+    const cleaned = text
       .replace(/(?:for\s*turn|forturn|call)?[:\s]*(?:default_?api:)?\w+\s*\{[\s\S]*?\}\s*result:\s*(?:\[[\s\S]*?\]|\{[\s\S]*?\})\s*[\u4e00-\u9fa5]*\s*/gi, '')
       .replace(/(?:for\s*turn|forturn|default_?api)[\s\S]*?(?:[\u4e00-\u9fa5]|result:[\s\S]*?\]|result:[\s\S]*?\})\s*/gi, '')
       .replace(/^(?:\[[\s\S]*?\]|\{[\s\S]*?\})\s*[\u4e00-\u9fa5]*\s*/g, '')
       .replace(/^[\s\u4e00-\u9fa5:]+/g, '')
       .trim();
+
+    if (
+      /\b(actor|actress|film\s*actor|kollywood|bollywood|cinema|formula\s*(?:two|one|2|1)|racing\s*driver|celebrity)\b/i.test(cleaned) ||
+      /clarify if you meant/i.test(cleaned)
+    ) {
+      return 'This is not a recognized place or city name. Kindly ask about the weather condition, forecast, or history for a specific city or location.';
+    }
+
+    return cleaned;
   }
 
   private addBotResponse(text: string, sessionId: string): void {

@@ -61,8 +61,26 @@ const searchHistoryTool: FunctionDeclaration = {
   }
 };
 
+export const NOT_A_CITY_MESSAGE =
+  "This is not a recognized place or city name. Kindly ask about the weather condition, forecast, or history for a specific city or location.";
+
 export class GeminiService {
   private genAI: GoogleGenerativeAI | null = null;
+
+  public static sanitizeWeatherResponse(text: string): string {
+    const cleaned = GeminiService.cleanFormatting(text);
+    if (!cleaned) return "";
+
+    const isOffTopicLeak =
+      /\b(actor|actress|film\s*actor|movie|cinema|kollywood|bollywood|hollywood|formula\s*(?:one|two|1|2)|championship|racing\s*driver|celebrity|politician|singer|director)\b/i.test(cleaned) ||
+      /clarify if you meant/i.test(cleaned);
+
+    if (isOffTopicLeak) {
+      return NOT_A_CITY_MESSAGE;
+    }
+
+    return cleaned;
+  }
 
   public static cleanFormatting(text: string): string {
     if (!text) return "";
@@ -137,7 +155,12 @@ SCOPE & STRICT BOUNDARIES:
 - You are strictly and exclusively a Weather AI Assistant.
 - You ONLY answer questions related to weather, meteorological conditions, temperatures, forecasts, humidity, wind speed, precipitation, rain/snow chances, climate, and search history.
 - If the user sends a friendly greeting (such as "hi", "hello", "how are you"), respond warmly in one brief sentence and invite them to ask a weather question.
-- If the user asks ANY question unrelated to weather (such as movies, cinema, celebrities, actors, sports, news, coding, politics, general knowledge, trivia, history, personal advice, etc.), you MUST politely decline to answer. State clearly that you are specifically a Weather Assistant and can only help with weather reports and forecasts, and invite them to ask about the weather for any city or location (e.g. "I am a dedicated Weather Assistant and can only help with weather forecasts, temperatures, and climate information. Please feel free to ask about the weather for any city!").
+- CRITICAL RULE FOR NON-CITY / NON-WEATHER QUERIES:
+  If the user asks about an actor, celebrity, movie, person, animal, object, concept, or any word that is NOT a real city or place (for example: "tell about ajith", "who is ajith", "who is shah rukh khan", "tell about cricket"):
+  - NEVER provide biographical information, filmographies, facts, or trivia.
+  - NEVER ask the user to clarify if they meant a famous actor or person.
+  - You MUST reply EXACTLY with:
+    "${NOT_A_CITY_MESSAGE}"
 - Do NOT answer off-topic questions under any circumstances.
 
 OUTPUT GUIDELINES:
@@ -207,7 +230,7 @@ OUTPUT GUIDELINES:
             }
           }
 
-          return GeminiService.cleanFormatting(rawOutput);
+          return GeminiService.sanitizeWeatherResponse(rawOutput);
         } catch (err: any) {
           lastError = err;
           console.warn(`Model ${modelName} (attempt ${attempt + 1}) encountered:`, err?.message || err);
@@ -218,7 +241,7 @@ OUTPUT GUIDELINES:
       }
     }
 
-    return GeminiService.cleanFormatting(await this.generateEmergencyFallback(message, lastError));
+    return GeminiService.sanitizeWeatherResponse(await this.generateEmergencyFallback(message, lastError));
   }
 
   private async generateEmergencyFallback(message: string, originalError: any): Promise<string> {
@@ -316,6 +339,6 @@ OUTPUT GUIDELINES:
       console.warn("Emergency fallback error:", e);
     }
 
-    return "⚠️ Google's AI servers were briefly busy. Please ask your weather question again (for example: *\"Forecast for Bangalore for next 5 days\"* or *\"Weather in Mumbai\"*).";
+    return NOT_A_CITY_MESSAGE;
   }
 }

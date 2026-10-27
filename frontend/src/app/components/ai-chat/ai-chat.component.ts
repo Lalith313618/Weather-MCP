@@ -116,7 +116,7 @@ export class AiChatComponent {
 
   formatMessage(text: string): string {
     if (!text) return '';
-    return text
+    const cleaned = text
       // 1. Remove leaked tool execution strings like forturn:defaultapi:getWeatherForecast{...}result:[...]表现 or similar
       .replace(/(?:for\s*turn|forturn|call)?[:\s]*(?:default_?api:)?\w+\s*\{[\s\S]*?\}\s*result:\s*(?:\[[\s\S]*?\]|\{[\s\S]*?\})\s*[\u4e00-\u9fa5]*\s*/gi, '')
       // 2. Catch any generic forturn/defaultapi or result traces
@@ -135,5 +135,14 @@ export class AiChatComponent {
       .replace(/\*\*/g, '')
       .replace(/\n{3,}/g, '\n\n')
       .trim();
+
+    if (
+      /\b(actor|actress|film\s*actor|kollywood|bollywood|cinema|formula\s*(?:two|one|2|1)|racing\s*driver|celebrity)\b/i.test(cleaned) ||
+      /clarify if you meant/i.test(cleaned)
+    ) {
+      return 'This is not a recognized place or city name. Kindly ask about the weather condition, forecast, or history for a specific city or location.';
+    }
+
+    return cleaned;
   }
 }
