@@ -62,11 +62,10 @@
   color: var(--theme-text-secondary, #B0C4DE);
   font-weight: 600;
   font-size: 0.92rem;
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+  box-shadow: none;
   white-space: nowrap;
 }
 
@@ -75,13 +74,28 @@
   background: var(--theme-card-hover, rgba(255, 255, 255, 0.14));
   border-color: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
+  box-shadow: none;
+}
+
+.tab-btn:focus,
+.tab-btn:focus-visible,
+.tab-btn:active {
+  outline: none;
+  box-shadow: none;
 }
 
 .tab-btn.active {
   background: var(--theme-card-bg, rgba(255, 255, 255, 0.12));
   border-color: var(--theme-accent, #F6D365);
   color: var(--theme-text-primary, #ffffff);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
+}
+
+.tab-btn.active:hover,
+.tab-btn.active:focus,
+.tab-btn.active:active {
+  box-shadow: none;
+  outline: none;
 }
 
 .pill-badge {
@@ -312,6 +326,8 @@
   border: none;
   padding: 0;
   cursor: pointer;
+  outline: none;
+  box-shadow: none;
 }
 
 .logout-btn span {
@@ -324,8 +340,8 @@
   color: #fca5a5;
   font-weight: 600;
   font-size: 0.88rem;
-  backdrop-filter: blur(var(--glass-blur));
   transition: all 0.25s ease;
+  box-shadow: none;
 }
 
 .logout-btn:hover span {
@@ -333,6 +349,17 @@
   border-color: #ef4444;
   color: #ffffff;
   transform: translateY(-1px);
+  box-shadow: none;
+}
+
+.logout-btn:focus,
+.logout-btn:focus-visible,
+.logout-btn:active,
+.logout-btn:focus span,
+.logout-btn:focus-visible span,
+.logout-btn:active span {
+  outline: none;
+  box-shadow: none;
 }
 
 .nav-login-btn,
