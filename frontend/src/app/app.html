@@ -1,4 +1,8 @@
-<div [class]="'app-shell ' + currentTheme()" [class.auth-shell]="isLoginPage()">
+<div
+  [class]="'app-shell ' + currentTheme()"
+  [class.auth-shell]="isLoginPage()"
+  [class.chat-shell]="activeTab() === 'ai-chat' && !isLoginPage()"
+>
   <app-header
     [activeTab]="activeTab()"
     [isLoginPage]="isLoginPage()"
@@ -8,6 +12,7 @@
   <main
     class="main-content"
     [class.wide-layout]="activeTab() === 'ai-chat' && !isLoginPage()"
+    [class.chat-layout]="activeTab() === 'ai-chat' && !isLoginPage()"
     [class.auth-layout]="isLoginPage()"
   >
     @if (isLoginPage()) {
