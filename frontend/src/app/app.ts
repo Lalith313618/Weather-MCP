@@ -304,10 +304,21 @@ export class App implements OnInit {
     });
   }
 
+  private cleanBotText(text: string): string {
+    if (!text) return '';
+    return text
+      .replace(/(?:for\s*turn|forturn|call)?[:\s]*(?:default_?api:)?\w+\s*\{[\s\S]*?\}\s*result:\s*(?:\[[\s\S]*?\]|\{[\s\S]*?\})\s*[\u4e00-\u9fa5]*\s*/gi, '')
+      .replace(/(?:for\s*turn|forturn|default_?api)[\s\S]*?(?:[\u4e00-\u9fa5]|result:[\s\S]*?\]|result:[\s\S]*?\})\s*/gi, '')
+      .replace(/^(?:\[[\s\S]*?\]|\{[\s\S]*?\})\s*[\u4e00-\u9fa5]*\s*/g, '')
+      .replace(/^[\s\u4e00-\u9fa5:]+/g, '')
+      .trim();
+  }
+
   private addBotResponse(text: string, sessionId: string): void {
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     this.chatThinking.set(false);
-    const botMsg: ChatMessage = { sender: 'assistant', text, time };
+    const sanitizedText = this.cleanBotText(text);
+    const botMsg: ChatMessage = { sender: 'assistant', text: sanitizedText, time };
 
     this.chatSessions.update((sessions) =>
       sessions.map((s) => {

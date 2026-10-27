@@ -117,6 +117,15 @@ export class AiChatComponent {
   formatMessage(text: string): string {
     if (!text) return '';
     return text
+      // 1. Remove leaked tool execution strings like forturn:defaultapi:getWeatherForecast{...}result:[...]表现 or similar
+      .replace(/(?:for\s*turn|forturn|call)?[:\s]*(?:default_?api:)?\w+\s*\{[\s\S]*?\}\s*result:\s*(?:\[[\s\S]*?\]|\{[\s\S]*?\})\s*[\u4e00-\u9fa5]*\s*/gi, '')
+      // 2. Catch any generic forturn/defaultapi or result traces
+      .replace(/(?:for\s*turn|forturn|default_?api)[\s\S]*?(?:[\u4e00-\u9fa5]|result:[\s\S]*?\]|result:[\s\S]*?\})\s*/gi, '')
+      // 3. Catch raw json arrays/objects emitted before answer if any
+      .replace(/^(?:\[[\s\S]*?\]|\{[\s\S]*?\})\s*[\u4e00-\u9fa5]*\s*/g, '')
+      // 4. Strip any leftover Chinese/Asian internal tokens like 表现
+      .replace(/^[\s\u4e00-\u9fa5:]+/g, '')
+      // 5. Clean markdown headers and symbols
       .replace(/^#{1,6}\s*(.*?)$/gm, '$1')
       .replace(/\*\*([^*]+)\*\*/g, '$1')
       .replace(/\*([^*]+)\*/g, '$1')

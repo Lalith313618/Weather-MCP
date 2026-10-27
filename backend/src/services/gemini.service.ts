@@ -67,7 +67,15 @@ export class GeminiService {
   public static cleanFormatting(text: string): string {
     if (!text) return "";
     return text
-    
+      // 1. Remove leaked tool execution strings like forturn:defaultapi:getWeatherForecast{...}result:[...]表现 or similar
+      .replace(/(?:for\s*turn|forturn|call)?[:\s]*(?:default_?api:)?\w+\s*\{[\s\S]*?\}\s*result:\s*(?:\[[\s\S]*?\]|\{[\s\S]*?\})\s*[\u4e00-\u9fa5]*\s*/gi, "")
+      // 2. Catch any generic forturn/defaultapi or result traces
+      .replace(/(?:for\s*turn|forturn|default_?api)[\s\S]*?(?:[\u4e00-\u9fa5]|result:[\s\S]*?\]|result:[\s\S]*?\})\s*/gi, "")
+      // 3. Catch raw json arrays/objects emitted before answer if any
+      .replace(/^(?:\[[\s\S]*?\]|\{[\s\S]*?\})\s*[\u4e00-\u9fa5]*\s*/g, "")
+      // 4. Strip any leftover Chinese/Asian internal tokens like 表现
+      .replace(/^[\s\u4e00-\u9fa5:]+/g, "")
+      // 5. Clean markdown headers and symbols
       .replace(/^#{1,6}\s*(.*?)$/gm, "$1")
       .replace(/\*\*([^*]+)\*\*/g, "$1")
       .replace(/\*([^*]+)\*/g, "$1")
@@ -104,7 +112,7 @@ export class GeminiService {
       geminiHistory.shift();
     }
 
-    const candidateModels = ["gemini-3.6-flash", "gemini-3-flash-preview", "gemini-3.1-flash-lite"];
+    const candidateModels = ["gemini-3-flash-preview", "gemini-3.1-flash-lite", "gemini-3.6-flash"];
     let lastError: any = null;
 
     for (const modelName of candidateModels) {
@@ -123,7 +131,7 @@ export class GeminiService {
                 functionDeclarations: [currentWeatherTool, forecastTool, yesterdayWeatherTool, searchHistoryTool]
               }
             ],
-            systemInstruction: `You are the Weather Assistant. Today is ${todayDateStr}. Always display temperatures in Celsius (°C).`
+            systemInstruction: `You are the Weather Assistant. Today is ${todayDateStr}. Always display temperatures in Celsius (°C). Never output internal function execution traces, turn prefixes (such as "forturn:", "defaultapi:", "result:"), or raw JSON objects in your final text. Always provide only a natural, polished, user-facing summary of the weather data.`
           });
 
           const chatSession = model.startChat({
@@ -177,7 +185,17 @@ export class GeminiService {
             functionCalls = response.response.functionCalls();
           }
 
-          return GeminiService.cleanFormatting(response.response.text());
+          let rawOutput = "";
+          try {
+            rawOutput = response.response.text();
+          } catch {
+            const parts = response.response.candidates?.[0]?.content?.parts;
+            if (parts && Array.isArray(parts)) {
+              rawOutput = parts.map((p) => p.text || "").filter(Boolean).join("\n");
+            }
+          }
+
+          return GeminiService.cleanFormatting(rawOutput);
         } catch (err: any) {
           lastError = err;
           console.warn(`Model ${modelName} (attempt ${attempt + 1}) encountered:`, err?.message || err);
