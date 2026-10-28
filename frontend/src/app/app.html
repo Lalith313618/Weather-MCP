@@ -7,6 +7,7 @@
     [activeTab]="activeTab()"
     [isLoginPage]="isLoginPage()"
     (tabChange)="switchTab($event)"
+    (toggleSidebar)="handleToggleSidebar()"
   ></app-header>
 
   <main
@@ -70,6 +71,7 @@
       } @else {
         <section class="ai-section">
           <app-ai-chat
+            #aiChat
             [messages]="chatMessages()"
             [thinking]="chatThinking()"
             [clearing]="chatClearing()"

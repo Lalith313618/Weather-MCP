@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { WeatherService } from './services/weather.service';
@@ -28,6 +28,11 @@ export class App implements OnInit {
   private readonly weatherService = inject(WeatherService);
   private readonly router = inject(Router, { optional: true });
   readonly authService = inject(AuthService);
+  readonly aiChat = viewChild<AiChatComponent>('aiChat');
+
+  handleToggleSidebar(): void {
+    this.aiChat()?.toggleHistory();
+  }
 
   readonly isLoginPage = computed<boolean>(() => !this.authService.isLoggedIn());
 

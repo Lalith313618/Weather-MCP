@@ -1,4 +1,4 @@
-<header class="app-header">
+<header class="app-header" [class.chat-tab-active]="activeTab() === 'ai-chat'">
   <div class="header-left">
     <a class="brand" routerLink="/">
       <div class="logo-icon">
@@ -13,6 +13,20 @@
   @if (authService.isLoggedIn() && !isLoginPage()) {
     <div class="header-center">
       <nav class="nav-tabs" aria-label="Main Navigation">
+        @if (activeTab() === 'ai-chat') {
+          <button
+            type="button"
+            class="sidebar-hamburger-btn"
+            (click)="toggleSidebar.emit()"
+            title="Open chat history sidebar"
+            aria-label="Open chat history sidebar"
+          >
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+            <span class="hamburger-bar"></span>
+          </button>
+        }
+
         <button
           type="button"
           class="tab-btn"

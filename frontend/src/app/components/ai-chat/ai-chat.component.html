@@ -1,9 +1,14 @@
 <div class="ai-chat-layout">
   <aside class="chat-history-sidebar" [class.collapsed]="!showHistory()">
     <div class="history-sidebar-header">
-      <div class="history-header-title">
-        <img src="icons/clock.svg" alt="History" class="history-icon-img" />
-        <span>Chat History</span>
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-logo">
+          <img src="icons/logo.svg" alt="Weather Logo" class="sidebar-logo-img" />
+        </div>
+        <div class="sidebar-brand-text">
+          <h3 class="sidebar-brand-title">Weather<span class="gradient-text">AI</span></h3>
+          <p class="sidebar-brand-subtitle">AI Assistance</p>
+        </div>
       </div>
       <button
         type="button"
@@ -16,7 +21,7 @@
       </button>
     </div>
 
-    <div class="new-chat-section">
+    <div class="sidebar-actions-section">
       <button
         type="button"
         class="new-chat-btn"
@@ -26,6 +31,17 @@
       >
         <img src="icons/plus.svg" alt="New Chat" class="btn-icon-img" />
         <span>New Chat</span>
+      </button>
+
+      <button
+        type="button"
+        class="sidebar-clear-chat-btn"
+        (click)="onClear()"
+        [disabled]="clearing() || thinking()"
+        title="Clear messages in this conversation"
+      >
+        <img src="icons/trash.svg" alt="Clear" class="trash-icon-img" />
+        <span>{{ clearing() ? 'Clearing...' : 'Clear Chat' }}</span>
       </button>
     </div>
 
@@ -67,6 +83,24 @@
         }
       }
     </div>
+
+    @if (authService.isLoggedIn()) {
+      <div class="sidebar-user-footer">
+        <div class="sidebar-user-badge" [title]="authService.currentUser() || 'User'">
+          <img src="icons/user.svg" alt="User" class="sidebar-user-icon" />
+          <span class="sidebar-user-name">{{ authService.currentUser() }}</span>
+        </div>
+
+        <button
+          type="button"
+          class="sidebar-logout-btn"
+          (click)="handleLogout()"
+          title="Sign out of account"
+        >
+          <span>Logout</span>
+        </button>
+      </div>
+    }
   </aside>
   @if (showHistory()) {
     <div class="history-backdrop" (click)="toggleHistory()"></div>

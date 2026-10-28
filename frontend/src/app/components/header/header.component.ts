@@ -18,6 +18,7 @@ export class HeaderComponent {
   readonly activeTab = input<'dashboard' | 'ai-chat'>('dashboard');
   readonly tabChange = output<'dashboard' | 'ai-chat'>();
   readonly openAuth = output<'login' | 'register'>();
+  readonly toggleSidebar = output<void>();
 
   switchTab(tab: 'dashboard' | 'ai-chat'): void {
     this.tabChange.emit(tab);

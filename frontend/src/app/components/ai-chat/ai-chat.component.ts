@@ -1,5 +1,6 @@
-import { Component, input, output, signal, ElementRef, viewChild, effect } from '@angular/core';
+import { Component, input, output, signal, ElementRef, viewChild, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
 
 export interface ChatMessage {
   sender: 'user' | 'assistant';
@@ -25,6 +26,8 @@ export interface ChatSession {
   styleUrl: './ai-chat.component.css'
 })
 export class AiChatComponent {
+  readonly authService = inject(AuthService);
+
   messages = input<ChatMessage[]>([]);
   thinking = input<boolean>(false);
   clearing = input<boolean>(false);
@@ -93,7 +96,17 @@ export class AiChatComponent {
   }
 
   onClear(): void {
+    if (typeof window !== 'undefined' && window.innerWidth <= 1024) {
+      this.showHistory.set(false);
+    }
     this.clearChat.emit();
+  }
+
+  handleLogout(): void {
+    if (typeof window !== 'undefined' && window.innerWidth <= 1024) {
+      this.showHistory.set(false);
+    }
+    this.authService.logout();
   }
 
   startEdit(index: number, text: string): void {
