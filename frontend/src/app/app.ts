@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { WeatherService } from './services/weather.service';
 import { CurrentWeather } from './models/weather.model';
 import { HeaderComponent } from './components/header/header.component';
@@ -8,6 +8,7 @@ import { SearchBarComponent } from './components/search-bar/search-bar.component
 import { CurrentWeatherComponent } from './components/current-weather/current-weather.component';
 import { AiChatComponent, ChatMessage, ChatSession } from './components/ai-chat/ai-chat.component';
 import { Login } from './features/auth/login/login';
+import { Register } from './features/auth/register/register';
 import { AuthService } from './services/auth.service';
 
 @Component({
@@ -19,7 +20,8 @@ import { AuthService } from './services/auth.service';
     SearchBarComponent,
     CurrentWeatherComponent,
     AiChatComponent,
-    Login
+    Login,
+    Register
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -27,11 +29,45 @@ import { AuthService } from './services/auth.service';
 export class App implements OnInit {
   private readonly weatherService = inject(WeatherService);
   private readonly router = inject(Router, { optional: true });
+  private readonly route = inject(ActivatedRoute, { optional: true });
   readonly authService = inject(AuthService);
   readonly aiChat = viewChild<AiChatComponent>('aiChat');
+  readonly showDashboardDrawer = signal<boolean>(false);
+  readonly authView = signal<'login' | 'register'>('login');
+
+  setAuthView(view: 'login' | 'register'): void {
+    this.authView.set(view);
+    if (this.router) {
+      this.router.navigate([], { queryParams: { view } });
+    }
+  }
 
   handleToggleSidebar(): void {
-    this.aiChat()?.toggleHistory();
+    if (this.activeTab() === 'dashboard') {
+      this.showDashboardDrawer.update((v) => !v);
+    } else {
+      this.aiChat()?.toggleHistory();
+    }
+  }
+
+  closeDashboardDrawer(): void {
+    this.showDashboardDrawer.set(false);
+  }
+
+  navigateToAssistant(): void {
+    this.showDashboardDrawer.set(false);
+    this.switchTab('ai-chat');
+  }
+
+  openSessionFromDrawer(sessionId: string): void {
+    this.showDashboardDrawer.set(false);
+    this.switchTab('ai-chat');
+    this.handleSelectSession(sessionId);
+  }
+
+  handleLogoutFromDrawer(): void {
+    this.showDashboardDrawer.set(false);
+    this.authService.logout();
   }
 
   readonly isLoginPage = computed<boolean>(() => !this.authService.isLoggedIn());
@@ -74,6 +110,17 @@ export class App implements OnInit {
   });
 
   ngOnInit(): void {
+    if (this.route) {
+      this.route.queryParams.subscribe((params) => {
+        const view = params['view'] || params['mode'];
+        if (view === 'register') {
+          this.authView.set('register');
+        } else if (view === 'login') {
+          this.authView.set('login');
+        }
+      });
+    }
+
     if (typeof localStorage !== 'undefined') {
       try {
         const savedTab = localStorage.getItem('weather_mcp_tab');

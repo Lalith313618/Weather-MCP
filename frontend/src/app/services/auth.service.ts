@@ -25,7 +25,6 @@ export class AuthService {
   }
 
   checkInitialAuth(): void {
-    // Preserve active session across page refreshes via sessionStorage
     if (typeof sessionStorage !== 'undefined') {
       const sessionStored = sessionStorage.getItem('weather_mcp_user');
       if (sessionStored) {
@@ -59,8 +58,6 @@ export class AuthService {
           return parsed;
         }
       }
-
-      // Seed a default demo account for immediate sign-in convenience
       const demoUsers: UserAccount[] = [
         {
           name: 'Demo User',

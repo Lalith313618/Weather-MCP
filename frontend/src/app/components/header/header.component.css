@@ -195,6 +195,10 @@
   }
 }
 
+.brand-mobile-inline {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .app-header {
     display: grid;
@@ -208,22 +212,67 @@
     align-items: center;
   }
 
-  .app-header.chat-tab-active {
+  .app-header.is-logged-in {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 0.45rem 0.75rem;
   }
 
-  .app-header.chat-tab-active .header-left,
-  .app-header.chat-tab-active .header-right {
+  .app-header.is-logged-in .header-left,
+  .app-header.is-logged-in .header-right {
     display: none !important;
   }
 
-  .app-header.chat-tab-active .header-center {
+  .app-header.is-logged-in .header-center {
     width: 100%;
     display: flex;
     justify-content: center;
+  }
+
+  .app-header.is-logged-in .user-greeting,
+  .app-header.is-logged-in .logout-btn {
+    display: none !important;
+  }
+
+  .app-header.is-logged-in .sidebar-hamburger-btn {
+    display: flex;
+  }
+
+  .dashboard-tab-active .dashboard-tab-btn {
+    display: none !important;
+  }
+
+  .dashboard-tab-active .brand-mobile-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    text-decoration: none;
+    color: inherit;
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .dashboard-tab-active .brand-mobile-inline .logo-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+  }
+
+  .dashboard-tab-active .brand-mobile-inline .brand-logo-img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .dashboard-tab-active .brand-mobile-inline .brand-text h1 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 1.2;
   }
 
   .header-left {
@@ -301,15 +350,6 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
-  }
-
-  .app-header.chat-tab-active .user-greeting,
-  .app-header.chat-tab-active .logout-btn {
-    display: none !important;
-  }
-
-  .app-header.chat-tab-active .sidebar-hamburger-btn {
-    display: flex;
   }
 
   .user-badge {

@@ -7,6 +7,7 @@
     [activeTab]="activeTab()"
     [isLoginPage]="isLoginPage()"
     (tabChange)="switchTab($event)"
+    (openAuth)="setAuthView($event)"
     (toggleSidebar)="handleToggleSidebar()"
   ></app-header>
 
@@ -17,7 +18,11 @@
     [class.auth-layout]="isLoginPage()"
   >
     @if (isLoginPage()) {
-      <app-login></app-login>
+      @if (authView() === 'register') {
+        <app-register (switchToLogin)="setAuthView('login')"></app-register>
+      } @else {
+        <app-login (switchToRegister)="setAuthView('register')"></app-login>
+      }
     } @else {
 
       @if (activeTab() === 'dashboard') {
@@ -66,6 +71,91 @@
                 [data]="currentWeather()"
               ></app-current-weather>
             </div>
+          }
+
+          @if (showDashboardDrawer()) {
+            <aside class="dashboard-drawer">
+              <div class="drawer-header">
+                <div class="sidebar-brand">
+                  <div class="sidebar-brand-logo">
+                    <img src="icons/logo.svg" alt="Weather Logo" class="sidebar-logo-img" />
+                  </div>
+                  <div class="sidebar-brand-text">
+                    <h3 class="sidebar-brand-title">Weather<span class="gradient-text">AI</span></h3>
+                    <p class="sidebar-brand-subtitle">Weather Dashboard</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="sidebar-close-btn"
+                  (click)="closeDashboardDrawer()"
+                  title="Close menu"
+                  aria-label="Close menu"
+                >
+                  &times;
+                </button>
+              </div>
+
+              <div class="drawer-nav-section">
+                <button
+                  type="button"
+                  class="drawer-nav-btn"
+                  (click)="navigateToAssistant()"
+                  title="Open Assistant AI"
+                >
+                  <div class="drawer-nav-left">
+                    <img src="icons/bot.svg" alt="AI Assistant" class="drawer-bot-icon" />
+                    <span>Assistant AI</span>
+                  </div>
+                  <span class="drawer-pill-badge">AI</span>
+                </button>
+              </div>
+
+              <div class="drawer-sessions-section">
+                <div class="drawer-section-label">
+                  <img src="icons/clock.svg" alt="Chats" class="drawer-clock-icon" />
+                  <span>Recent Chats</span>
+                </div>
+
+                <div class="drawer-sessions-list">
+                  @if (chatSessions().length === 0) {
+                    <div class="empty-drawer-state">
+                      <p>No chat history yet</p>
+                      <small>Chat with Assistant AI to see recent questions.</small>
+                    </div>
+                  } @else {
+                    @for (s of chatSessions().slice(0, 5); track s.id) {
+                      <div
+                        class="drawer-session-item"
+                        (click)="openSessionFromDrawer(s.id)"
+                        title="Open this conversation"
+                      >
+                        <img src="icons/chat.svg" alt="Chat" class="session-chat-icon" />
+                        <span class="session-title">{{ s.title }}</span>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+
+              <div class="sidebar-user-footer">
+                <div class="sidebar-user-badge" [title]="authService.currentUser() || 'User'">
+                  <img src="icons/user.svg" alt="User" class="sidebar-user-icon" />
+                  <span class="sidebar-user-name">{{ authService.currentUser() }}</span>
+                </div>
+
+                <button
+                  type="button"
+                  class="sidebar-logout-btn"
+                  (click)="handleLogoutFromDrawer()"
+                  title="Sign out of account"
+                >
+                  <span>Logout</span>
+                </button>
+              </div>
+            </aside>
+
+            <div class="drawer-backdrop" (click)="closeDashboardDrawer()"></div>
           }
         </section>
       } @else {

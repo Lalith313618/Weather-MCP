@@ -1,10 +1,8 @@
-import { Component, signal, inject, OnInit, output } from '@angular/core';
+import { Component, signal, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-
-export type AuthViewState = 'welcome' | 'login' | 'register';
 
 @Component({
   selector: 'app-login',
@@ -13,59 +11,25 @@ export type AuthViewState = 'welcome' | 'login' | 'register';
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login implements OnInit {
+export class Login {
   private readonly router = inject(Router, { optional: true });
-  private readonly route = inject(ActivatedRoute, { optional: true });
   private readonly authService = inject(AuthService);
 
-  readonly backToDashboard = output<void>();
+  readonly switchToRegister = output<void>();
 
-  name = '';
   email = '';
   password = '';
   rememberMe = false;
 
-  readonly viewState = signal<AuthViewState>('login');
   readonly showPassword = signal<boolean>(false);
   readonly loading = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
 
-  ngOnInit(): void {
-    if (this.route) {
-      this.route.queryParams.subscribe((params) => {
-        const view = params['view'] || params['mode'];
-        if (view === 'register') {
-          this.viewState.set('register');
-        } else if (view === 'welcome') {
-          this.viewState.set('welcome');
-        } else {
-          this.viewState.set('login');
-        }
-      });
-    }
-  }
-
-  openForm(mode: 'login' | 'register'): void {
-    this.viewState.set(mode);
+  openRegister(): void {
     this.errorMessage.set(null);
+    this.switchToRegister.emit();
     if (this.router) {
-      this.router.navigate([], { queryParams: { view: mode } });
-    }
-  }
-
-  goBackToHome(): void {
-    this.errorMessage.set(null);
-    this.backToDashboard.emit();
-    if (this.router) {
-      this.router.navigate(['/'], { queryParams: { view: 'dashboard' } });
-    }
-  }
-
-  goBackToWelcome(): void {
-    this.viewState.set('welcome');
-    this.errorMessage.set(null);
-    if (this.router) {
-      this.router.navigate([], { queryParams: { view: 'welcome' } });
+      this.router.navigate([], { queryParams: { view: 'register' } });
     }
   }
 
@@ -75,13 +39,6 @@ export class Login implements OnInit {
 
   handleLogin(): void {
     this.errorMessage.set(null);
-
-    if (this.viewState() === 'register') {
-      if (!this.name || !this.name.trim()) {
-        this.errorMessage.set('Please enter your full name');
-        return;
-      }
-    }
 
     if (!this.email || !this.email.trim()) {
       this.errorMessage.set('Please enter your email or username');
@@ -98,21 +55,12 @@ export class Login implements OnInit {
     setTimeout(() => {
       this.loading.set(false);
 
-      if (this.viewState() === 'register') {
-        const res = this.authService.register(this.name, this.email, this.password, this.rememberMe);
-        if (!res.success) {
-          this.errorMessage.set(res.error || 'Registration failed');
-          return;
-        }
-      } else {
-        const res = this.authService.login(this.email, this.password, this.rememberMe);
-        if (!res.success) {
-          this.errorMessage.set(res.error || 'Login failed');
-          return;
-        }
+      const res = this.authService.login(this.email, this.password, this.rememberMe);
+      if (!res.success) {
+        this.errorMessage.set(res.error || 'Login failed');
+        return;
       }
 
-      // Navigate to home dashboard on successful authentication
       if (typeof localStorage !== 'undefined') {
         try {
           localStorage.setItem('weather_mcp_tab', 'dashboard');

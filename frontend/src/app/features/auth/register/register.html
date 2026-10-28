@@ -1,1 +1,112 @@
-<p>register works!</p>
+<div class="register-wrapper">
+  <div class="register-card form-card">
+    <div class="auth-tabs">
+      <button
+        type="button"
+        class="auth-tab"
+        (click)="openLogin()"
+      >
+        Login
+      </button>
+      <button
+        type="button"
+        class="auth-tab active"
+      >
+        Register
+      </button>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert-banner">
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form class="register-form" (ngSubmit)="handleRegister()">
+      <div class="form-group">
+        <label for="reg-name">Full Name</label>
+        <div class="input-container">
+          <img src="icons/user.svg" alt="Name" class="input-icon" />
+          <input
+            id="reg-name"
+            type="text"
+            placeholder="John Doe"
+            [(ngModel)]="name"
+            name="name"
+            required
+            autocomplete="name"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-email">Email Address</label>
+        <div class="input-container">
+          <img src="icons/mail.svg" alt="Email" class="input-icon" />
+          <input
+            id="reg-email"
+            type="email"
+            placeholder="you@example.com"
+            [(ngModel)]="email"
+            name="email"
+            required
+            autocomplete="email"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-password">Password</label>
+        <div class="input-container">
+          <img src="icons/lock.svg" alt="Password" class="input-icon" />
+          <input
+            id="reg-password"
+            [type]="showPassword() ? 'text' : 'password'"
+            placeholder="••••••••"
+            [(ngModel)]="password"
+            name="password"
+            required
+            autocomplete="new-password"
+          />
+          <button
+            type="button"
+            class="toggle-pwd-btn"
+            (click)="togglePasswordVisibility()"
+            aria-label="Toggle password visibility"
+          >
+            @if (showPassword()) {
+              <img src="icons/eye-off.svg" alt="Hide password" class="toggle-icon" />
+            } @else {
+              <img src="icons/eye.svg" alt="Show password" class="toggle-icon" />
+            }
+          </button>
+        </div>
+      </div>
+
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" />
+          <span class="custom-checkbox"></span>
+          <span>Remember me</span>
+        </label>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner"></span>
+          <span>Creating Account...</span>
+        } @else {
+          <span>Register & Continue</span>
+          <img src="icons/arrow-right.svg" alt="Continue" class="arrow-icon" />
+        }
+      </button>
+    </form>
+
+    <div class="card-footer">
+      <p>
+        Already have an account? <a href="javascript:void(0)" class="signup-link" (click)="openLogin()">Sign In</a>
+      </p>
+    </div>
+  </div>
+</div>
+

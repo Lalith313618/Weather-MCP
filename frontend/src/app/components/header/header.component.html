@@ -1,4 +1,9 @@
-<header class="app-header" [class.chat-tab-active]="activeTab() === 'ai-chat'">
+<header
+  class="app-header"
+  [class.is-logged-in]="authService.isLoggedIn() && !isLoginPage()"
+  [class.chat-tab-active]="activeTab() === 'ai-chat'"
+  [class.dashboard-tab-active]="activeTab() === 'dashboard'"
+>
   <div class="header-left">
     <a class="brand" routerLink="/">
       <div class="logo-icon">
@@ -13,23 +18,32 @@
   @if (authService.isLoggedIn() && !isLoginPage()) {
     <div class="header-center">
       <nav class="nav-tabs" aria-label="Main Navigation">
-        @if (activeTab() === 'ai-chat') {
-          <button
-            type="button"
-            class="sidebar-hamburger-btn"
-            (click)="toggleSidebar.emit()"
-            title="Open chat history sidebar"
-            aria-label="Open chat history sidebar"
-          >
-            <span class="hamburger-bar"></span>
-            <span class="hamburger-bar"></span>
-            <span class="hamburger-bar"></span>
-          </button>
+        <button
+          type="button"
+          class="sidebar-hamburger-btn"
+          (click)="toggleSidebar.emit()"
+          title="Open chat history sidebar"
+          aria-label="Open chat history sidebar"
+        >
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+
+        @if (activeTab() === 'dashboard') {
+          <a class="brand-mobile-inline" routerLink="/">
+            <div class="logo-icon">
+              <img src="icons/logo.svg" alt="Weather Logo" class="brand-logo-img" />
+            </div>
+            <div class="brand-text">
+              <h1>Weather <span class="gradient-text">AI</span></h1>
+            </div>
+          </a>
         }
 
         <button
           type="button"
-          class="tab-btn"
+          class="tab-btn dashboard-tab-btn"
           [class.active]="activeTab() === 'dashboard'"
           (click)="switchTab('dashboard')"
         >
